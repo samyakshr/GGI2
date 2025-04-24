@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <title>
+    GGI Display
+  </title>
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
+  <!-- Nucleo Icons -->
+  <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- Material Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+    
+    body {
+      background-color: #000;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .tv-frame {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(45deg, #1a1a1a, #000);
+      border: 20px solid #333;
+      border-radius: 20px;
+      box-shadow: 0 0 50px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    .tv-frame::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.5) 0%, transparent 70%),
+        radial-gradient(circle at 80% 80%, rgba(65, 105, 225, 0.5) 0%, transparent 70%),
+        radial-gradient(circle at 50% 50%, rgba(255, 105, 180, 0.5) 0%, transparent 70%);
+      animation: gradientShift 8s ease infinite;
+      z-index: 0;
+    }
+
+    .tv-frame::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 60% 40%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+      animation: gradientPulse 4s ease infinite;
+      z-index: 0;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 0%;
+        transform: scale(1);
+      }
+      25% {
+        background-position: 100% 0%;
+        transform: scale(1.1);
+      }
+      50% {
+        background-position: 100% 100%;
+        transform: scale(1);
+      }
+      75% {
+        background-position: 0% 100%;
+        transform: scale(1.1);
+      }
+      100% {
+        background-position: 0% 0%;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes gradientPulse {
+      0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.2);
+      }
+    }
+
+    .emotion-display {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 80%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      z-index: 1;
+    }
+    
+    .emotion-icon {
+      font-size: 120px;
+      margin-bottom: 20px;
+      animation: bounce 1s ease infinite;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+    
+    .emotion-text {
+      font-size: 48px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+    
+    .ticker-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 20%;
+      background: rgba(0,0,0,0.8);
+      border-top: 2px solid #333;
+      overflow: hidden;
+    }
+    
+    .ticker {
+      position: absolute;
+      white-space: nowrap;
+      color: white;
+      font-size: 24px;
+      line-height: 1.5;
+      padding: 20px;
+      animation: ticker 30s linear infinite;
+    }
+    
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    
+    .back-button:hover {
+      background: rgba(0, 0, 0, 0.8);
+    }
+    
+    .recent-experience {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 20%;
+      background: rgba(0,0,0,0.8);
+      border-top: 2px solid #333;
+      overflow: hidden;
+      text-align: left;
+      color: white;
+      font-size: 24px;
+      line-height: 1.5;
+      padding: 20px;
+      white-space: nowrap;
+      animation: ticker 30s linear infinite;
+      font-weight: 400;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+    
+    .artwork-display {
+      position: absolute;
+      bottom: 20%;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 28px;
+      font-weight: 600;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+    
+    @keyframes ticker {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+    
+    .happy { 
+      color: #FFD700;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+    .sad { 
+      color: #4169E1;
+      text-shadow: 0 0 20px rgba(65, 105, 225, 0.5);
+    }
+    .nostalgic { 
+      color: #FF69B4;
+      text-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+    }
+    .bored { 
+      color: #808080;
+      text-shadow: 0 0 20px rgba(128, 128, 128, 0.5);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="tv-frame">
+    <button class="back-button" onclick="window.location.href='dashboard.html'">
+      <i class="material-symbols-rounded">arrow_back</i> Back to Dashboard
+    </button>
+    <div class="emotion-display">
+      <div class="emotion-icon" id="emotion-icon">😊</div>
+      <div class="emotion-text" id="emotion-text">HAPPY</div>
+    </div>
+    <div class="artwork-display" id="artwork-display">
+      Loading artwork information...
+    </div>
+    <div class="recent-experience" id="recent-experience">
+      Loading recent experience...
+    </div>
+  </div>
+
+  <script>
+    // Function to get emotion icon
+    function getEmotionIcon(emotion) {
+      switch(emotion.toLowerCase()) {
+        case 'happy': return '😊';
+        case 'sad': return '😢';
+        case 'nostalgic': return '😌';
+        case 'bored': return '😐';
+        default: return '😊';
+      }
+    }
+
+    // Function to update display
+    async function updateDisplay() {
+      try {
+        const scriptUrl = 'YOUR_DEPLOYMENT_URL'; // Replace this with your actual deployment URL
+        const response = await fetch(scriptUrl);
+        
+        // If fetch fails, use sample data
+        let data;
+        if (!response.ok) {
+          console.log('Using sample data due to fetch error');
+          data = {
+            emotionCounts: {
+              'happy': 5,
+              'sad': 2,
+              'nostalgic': 3,
+              'bored': 1
+            },
+            recentResponses: [
+              {
+                experience: "I loved the contemporary art exhibition! The colors and textures were absolutely mesmerizing.",
+                artwork: "Untitled No. 7",
+                timestamp: new Date().toISOString()
+              },
+              {
+                experience: "The sculptures were fascinating, especially the way they played with light and shadow.",
+                artwork: "Bronze Series",
+                timestamp: new Date().toISOString()
+              }
+            ]
+          };
+        } else {
+          data = await response.json();
+        }
+        
+        // Update emotion display
+        const emotionCounts = data.emotionCounts;
+        const dominantEmotion = Object.entries(emotionCounts).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+        
+        const emotionIcon = document.getElementById('emotion-icon');
+        const emotionText = document.getElementById('emotion-text');
+        
+        emotionIcon.textContent = getEmotionIcon(dominantEmotion);
+        emotionIcon.className = `emotion-icon ${dominantEmotion.toLowerCase()}`;
+        emotionText.textContent = dominantEmotion.toUpperCase();
+        emotionText.className = `emotion-text ${dominantEmotion.toLowerCase()}`;
+        
+        // Update artwork display
+        const artworkDisplay = document.getElementById('artwork-display');
+        const responses = data.recentResponses || [];
+        if (responses.length > 0) {
+          const latestResponse = responses[0];
+          artworkDisplay.textContent = `${latestResponse.artwork} (${new Date(latestResponse.timestamp).toLocaleTimeString()})`;
+          artworkDisplay.style.display = 'block';
+        } else {
+          artworkDisplay.textContent = 'No artwork information available';
+        }
+        
+        // Update recent experience ticker
+        const recentExperience = document.getElementById('recent-experience');
+        if (responses.length > 0) {
+          const tickerText = responses.map(r => 
+            `"${r.experience}"`
+          ).join(' • ');
+          recentExperience.textContent = tickerText || 'No responses yet';
+          recentExperience.style.display = 'block';
+        }
+        
+      } catch (error) {
+        console.error('Error updating display:', error);
+        // Set default content if there's an error
+        document.getElementById('emotion-icon').textContent = '😊';
+        document.getElementById('emotion-text').textContent = 'HAPPY';
+        document.getElementById('artwork-display').textContent = 'Unable to load artwork information';
+        document.getElementById('recent-experience').textContent = 'Unable to load responses';
+      }
+    }
+
+    // Update display immediately and then every 5 seconds
+    updateDisplay();
+    setInterval(updateDisplay, 5000);
+  </script>
+</body>
+
+</html> 

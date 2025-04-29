@@ -1,35 +1,76 @@
+function onOpen() {
+  // This function runs when the spreadsheet is opened
+  // It helps ensure the script has proper permissions
+  SpreadsheetApp.getUi()
+    .createMenu('GGI2 Dashboard')
+    .addItem('Refresh Data', 'refreshDashboard')
+    .addToUi();
+}
+
+function refreshDashboard() {
+  // This function can be called manually to refresh the data
+  processData(SpreadsheetApp.getActiveSheet().getDataRange().getValues());
+}
+
 function doGet(e) {
   try {
     // Get the active spreadsheet
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getActiveSheet();
     
+    // Log the attempt to access the sheet
+    Logger.log('Attempting to access sheet: ' + sheet.getName());
+    
     // Get all data from the sheet
     var data = sheet.getDataRange().getValues();
-    Logger.log('Raw data: ' + JSON.stringify(data));
+    Logger.log('Raw data retrieved, rows: ' + data.length);
     
     // Process the data
     var processedData = processData(data);
-    Logger.log('Processed data: ' + JSON.stringify(processedData));
+    Logger.log('Data processed successfully');
     
-    // Return as JSON
-    return ContentService.createTextOutput(JSON.stringify(processedData))
-      .setMimeType(ContentService.MimeType.JSON);
+    // Create the response
+    var output = ContentService.createTextOutput(JSON.stringify(processedData));
+    
+    // Set CORS headers
+    output.setMimeType(ContentService.MimeType.JSON);
+    output.setHeader('Access-Control-Allow-Origin', '*');
+    output.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    output.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    output.setHeader('Access-Control-Max-Age', '3600');
+    
+    return output;
   } catch (error) {
     Logger.log('Error in doGet: ' + error.toString());
-    return ContentService.createTextOutput(JSON.stringify({
+    
+    // Create error response
+    var errorOutput = ContentService.createTextOutput(JSON.stringify({
       error: error.toString(),
-      artworkVotes: { 'Tree': 0, 'Flower': 0, 'Swing': 0, 'House': 0 },
-      emotionCounts: { 'happy': 0, 'sad': 0, 'nostalgic': 0, 'bored': 0 },
+      message: 'Failed to process data. Please check the logs.',
+      artworkVotes: {},
+      emotionCounts: {},
       recentResponses: []
-    })).setMimeType(ContentService.MimeType.JSON);
+    }));
+    
+    // Set CORS headers for error response
+    errorOutput.setMimeType(ContentService.MimeType.JSON);
+    errorOutput.setHeader('Access-Control-Allow-Origin', '*');
+    errorOutput.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    errorOutput.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    errorOutput.setHeader('Access-Control-Max-Age', '3600');
+    
+    return errorOutput;
   }
 }
 
 function processData(data) {
   try {
+    if (!data || data.length === 0) {
+      throw new Error('No data found in the sheet');
+    }
+    
     var headers = data[0];
-    Logger.log('Headers: ' + JSON.stringify(headers));
+    Logger.log('Headers found: ' + JSON.stringify(headers));
     
     var artworkVotes = {
       'Tree': 0,
@@ -59,16 +100,20 @@ function processData(data) {
     Logger.log('Column indices - Experience: ' + experienceColIndex + ', Artwork: ' + artworkColIndex);
     
     if (experienceColIndex === -1 || artworkColIndex === -1) {
-      throw new Error('Required columns not found in spreadsheet');
+      throw new Error('Required columns not found in spreadsheet. Please check column headers.');
     }
     
     // Skip header row
     for (var i = 1; i < data.length; i++) {
       var row = data[i];
-      Logger.log('Processing row ' + i + ': ' + JSON.stringify(row));
       
       // Get the timestamp
       var timestamp = new Date(row[timestampColIndex]);
+      if (isNaN(timestamp.getTime())) {
+        Logger.log('Invalid timestamp in row ' + i + ': ' + row[timestampColIndex]);
+        continue;
+      }
+      
       timestamp.setHours(0, 0, 0, 0);
       
       // Check if the response is from today
@@ -84,7 +129,6 @@ function processData(data) {
           var artwork = row[artworkColIndex];
           if (artwork && typeof artwork === 'string') {
             artwork = artwork.trim();
-            Logger.log('Found artwork: ' + artwork);
             if (artworkVotes.hasOwnProperty(artwork)) {
               artworkVotes[artwork]++;
             }
@@ -186,4 +230,14 @@ function classifyEmotion(text) {
 function onFormSubmit(e) {
   // This function will run when a form is submitted
   // You can add any additional processing here
+}
+
+function doOptions() {
+  var output = ContentService.createTextOutput('');
+  output.setMimeType(ContentService.MimeType.JSON);
+  output.setHeader('Access-Control-Allow-Origin', '*');
+  output.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  output.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  output.setHeader('Access-Control-Max-Age', '3600');
+  return output;
 } 

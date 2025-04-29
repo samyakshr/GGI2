@@ -1,0 +1,50 @@
+{
+  "artworkVotes": {
+    "Tree": 2,
+    "Flower": 3,
+    "Swing": 1,
+    "House": 2
+  },
+  "emotionCounts": {
+    "happy": 4,
+    "sad": 1,
+    "nostalgic": 2,
+    "bored": 1
+  },
+  "recentResponses": [
+    {
+      "experience": "The gallery made me feel so happy and inspired!",
+      "artwork": "Flower",
+      "emotion": "happy",
+      "timestamp": "2024-04-15T14:30:00"
+    },
+    {
+      "experience": "Reminded me of my childhood home",
+      "artwork": "House",
+      "emotion": "nostalgic",
+      "timestamp": "2024-04-15T14:25:00"
+    },
+    {
+      "experience": "The artwork was beautiful and uplifting",
+      "artwork": "Tree",
+      "emotion": "happy",
+      "timestamp": "2024-04-15T14:20:00"
+    },
+    {
+      "experience": "I felt a bit bored, nothing really caught my attention",
+      "artwork": "Swing",
+      "emotion": "bored",
+      "timestamp": "2024-04-15T14:15:00"
+    },
+    {
+      "experience": "The exhibition made me feel sad and reflective",
+      "artwork": "Tree",
+      "emotion": "sad",
+      "timestamp": "2024-04-15T14:10:00"
+    }
+  ],
+  "dailyStats": {
+    "totalResponses": 8,
+    "engagementRate": 75
+  }
+} 

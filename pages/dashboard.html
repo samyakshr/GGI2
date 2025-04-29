@@ -336,26 +336,156 @@
     async function fetchData() {
       try {
         console.log('Fetching data from Google Sheets...');
-        const scriptUrl = 'AKfycbyc9rYqD3c84InOCGIf9DOsWwObvhZmE6NYRL2MC76wAwuSON8HDz9znouubO3-i1Dy';
-        const response = await fetch(scriptUrl);
+        const spreadsheetId = '1HbaoSO3-QHKhYUHy4DuerkH_Z2kV9eoPQOOhTkTWwhQ';
+        const apiKey = 'AIzaSyCOmA67laPyNblmRifkKckoYCZKo8FmyfU';
+        const range = 'Form Responses 1!A:D'; // Updated to use the correct sheet name
+        
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+        console.log('Using API URL:', url);
+        
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Received data:', data);
+        console.log('Raw data from Google Sheets:', data);
         
-        if (data.error) {
-          console.error('Error from server:', data.error);
-          return getSampleData();
-        }
-        
-        return data;
+        // Process the data
+        const processedData = processSheetData(data.values);
+        console.log('Processed data:', processedData);
+        return processedData;
       } catch (error) {
         console.error('Error fetching data:', error);
         return getSampleData();
       }
+    }
+
+    // Function to process sheet data
+    function processSheetData(values) {
+      if (!values || values.length === 0) {
+        throw new Error('No data found in the sheet');
+      }
+      
+      const headers = values[0];
+      const experienceColIndex = headers.indexOf("How would you describe your experience at the gallery today in one sentence or phrase?");
+      const artworkColIndex = headers.indexOf("Which artwork stood out to you the most?");
+      const timestampColIndex = 0;
+      
+      const artworkVotes = {
+        'Tree': 0,
+        'Flower': 0,
+        'Swing': 0,
+        'House': 0
+      };
+      
+      const emotionCounts = {
+        'happy': 0,
+        'sad': 0,
+        'nostalgic': 0,
+        'bored': 0
+      };
+      
+      const recentResponses = [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let totalResponsesToday = 0;
+      let totalEngagementToday = 0;
+      
+      // Skip header row
+      for (let i = 1; i < values.length; i++) {
+        const row = values[i];
+        const timestamp = new Date(row[timestampColIndex]);
+        
+        if (isNaN(timestamp.getTime())) {
+          continue;
+        }
+        
+        timestamp.setHours(0, 0, 0, 0);
+        
+        if (timestamp.getTime() === today.getTime()) {
+          totalResponsesToday++;
+          
+          const experience = row[experienceColIndex]?.trim() || '';
+          const artwork = row[artworkColIndex]?.trim() || '';
+          
+          if (artwork && artworkVotes.hasOwnProperty(artwork)) {
+            artworkVotes[artwork]++;
+          }
+          
+          const emotion = classifyEmotion(experience);
+          if (emotionCounts.hasOwnProperty(emotion)) {
+            emotionCounts[emotion]++;
+          }
+          
+          if (emotion === 'happy' || emotion === 'nostalgic') {
+            totalEngagementToday++;
+          }
+          
+          if (recentResponses.length < 10) {
+            recentResponses.unshift({
+              experience: experience,
+              artwork: artwork || 'Unknown',
+              emotion: emotion,
+              timestamp: row[timestampColIndex]
+            });
+          }
+        }
+      }
+      
+      const engagementRate = totalResponsesToday > 0 ? 
+        Math.round((totalEngagementToday / totalResponsesToday) * 100) : 0;
+      
+      return {
+        artworkVotes,
+        emotionCounts,
+        recentResponses,
+        dailyStats: {
+          totalResponses: totalResponsesToday,
+          engagementRate
+        }
+      };
+    }
+
+    // Function to classify emotion from text
+    function classifyEmotion(text) {
+      text = text.toLowerCase();
+      
+      const happyKeywords = ['happy', 'joy', 'great', 'wonderful', 'amazing', 'love', 'enjoy', 'beautiful', 'excellent', 'fantastic', 'inspiring', 'uplifting', 'delightful', 'peaceful', 'calm'];
+      const sadKeywords = ['sad', 'disappoint', 'bad', 'poor', 'unhappy', 'terrible', 'awful', 'horrible', 'upset', 'depressed', 'uninspiring', 'disheartening', 'gloomy', 'melancholy'];
+      const nostalgicKeywords = ['nostalgic', 'memory', 'remember', 'childhood', 'past', 'old', 'back then', 'reminisce', 'recall', 'memories', 'youth', 'childhood', 'reminiscent', 'sentimental', 'grandmother', 'grandfather', 'family'];
+      const boredKeywords = ['bored', 'boring', 'uninteresting', 'dull', 'tired', 'monotonous', 'repetitive', 'tedious', 'uninspiring', 'unexciting', 'uninspired', 'unmotivated'];
+      
+      const counts = {
+        'happy': 0,
+        'sad': 0,
+        'nostalgic': 0,
+        'bored': 0
+      };
+      
+      happyKeywords.forEach(keyword => { if (text.includes(keyword)) counts.happy++; });
+      sadKeywords.forEach(keyword => { if (text.includes(keyword)) counts.sad++; });
+      nostalgicKeywords.forEach(keyword => { if (text.includes(keyword)) counts.nostalgic++; });
+      boredKeywords.forEach(keyword => { if (text.includes(keyword)) counts.bored++; });
+      
+      let maxCount = 0;
+      let maxEmotion = 'happy';
+      
+      for (const emotion in counts) {
+        if (counts[emotion] > maxCount) {
+          maxCount = counts[emotion];
+          maxEmotion = emotion;
+        }
+      }
+      
+      return maxEmotion;
     }
 
     // Wait for the DOM to be fully loaded before initializing charts
@@ -655,11 +785,12 @@
     // Function to fetch and display recent responses
     async function fetchRecentResponses() {
       try {
-        const scriptUrl = 'AKfycbyc9rYqD3c84InOCGIf9DOsWwObvhZmE6NYRL2MC76wAwuSON8HDz9znouubO3-i1Dy';
-        const response = await fetch(scriptUrl);
+        const response = await fetch('../data/responses.json');
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         const data = await response.json();
         updateRecentResponses(data.recentResponses || []);
       } catch (error) {

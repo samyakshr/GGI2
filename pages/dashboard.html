@@ -29,7 +29,7 @@
   <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- Material Icons -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
   <!-- CSS Files -->
@@ -246,6 +246,20 @@
                 </div>
               </div>
     </div>
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header p-3">
+            <h5 class="mb-0">Weekly Response Frequency</h5>
+          </div>
+          <div class="card-body p-3">
+            <div class="chart">
+              <canvas id="weekly-entries-chart" class="chart-canvas" height="300"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
@@ -338,29 +352,32 @@
         console.log('Fetching data from Google Sheets...');
         const spreadsheetId = '1HbaoSO3-QHKhYUHy4DuerkH_Z2kV9eoPQOOhTkTWwhQ';
         const apiKey = 'AIzaSyCOmA67laPyNblmRifkKckoYCZKo8FmyfU';
-        const range = 'Form Responses 1!A:D'; // Updated to use the correct sheet name
+        const range = 'Form Responses 1!A:D';
         
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
-        console.log('Using API URL:', url);
         
         const response = await fetch(url, {
           method: 'GET',
           headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Accept': 'application/json'
           }
         });
         
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`API request failed: ${response.status} ${response.statusText}`);
         }
         
         const data = await response.json();
-        console.log('Raw data from Google Sheets:', data);
+        if (!data.values || data.values.length === 0) {
+          throw new Error('No data found in sheet');
+        }
         
-        // Process the data
         const processedData = processSheetData(data.values);
-        console.log('Processed data:', processedData);
+        
+        // Process monthly data instead of weekly
+        const monthlyData = processMonthlyData(processedData.recentResponses);
+        updateMonthlyChart(monthlyData);
+        
         return processedData;
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -375,9 +392,10 @@
       }
       
       const headers = values[0];
-      const experienceColIndex = headers.indexOf("How would you describe your experience at the gallery today in one sentence or phrase?");
-      const artworkColIndex = headers.indexOf("Which artwork stood out to you the most?");
-      const timestampColIndex = 0;
+      // Update column indices based on your actual Google Sheet headers
+      const experienceColIndex = 1; // "How would you describe your experience..."
+      const artworkColIndex = 2;    // "Which artwork stood out to you the most?"
+      const timestampColIndex = 0;   // Timestamp column
       
       const artworkVotes = {
         'Tree': 0,
@@ -399,54 +417,56 @@
       let totalResponsesToday = 0;
       let totalEngagementToday = 0;
       
-      // Skip header row
+      // Process all rows (including those not from today for testing)
       for (let i = 1; i < values.length; i++) {
         const row = values[i];
         const timestamp = new Date(row[timestampColIndex]);
+        const experience = row[experienceColIndex]?.trim() || '';
+        const artwork = row[artworkColIndex]?.trim() || '';
         
-        if (isNaN(timestamp.getTime())) {
-          continue;
+        // Count all responses
+        totalResponsesToday++;
+        
+        if (artwork && artworkVotes.hasOwnProperty(artwork)) {
+          artworkVotes[artwork]++;
         }
         
-        timestamp.setHours(0, 0, 0, 0);
-        
-        if (timestamp.getTime() === today.getTime()) {
-          totalResponsesToday++;
-          
-          const experience = row[experienceColIndex]?.trim() || '';
-          const artwork = row[artworkColIndex]?.trim() || '';
-          
-          if (artwork && artworkVotes.hasOwnProperty(artwork)) {
-            artworkVotes[artwork]++;
-          }
-          
-          const emotion = classifyEmotion(experience);
-          if (emotionCounts.hasOwnProperty(emotion)) {
-            emotionCounts[emotion]++;
-          }
-          
-          if (emotion === 'happy' || emotion === 'nostalgic') {
-            totalEngagementToday++;
-          }
-          
-          if (recentResponses.length < 10) {
-            recentResponses.unshift({
-              experience: experience,
-              artwork: artwork || 'Unknown',
-              emotion: emotion,
-              timestamp: row[timestampColIndex]
-            });
-          }
+        const emotion = classifyEmotion(experience);
+        if (emotionCounts.hasOwnProperty(emotion)) {
+          emotionCounts[emotion]++;
         }
+        
+        if (emotion === 'happy' || emotion === 'nostalgic') {
+          totalEngagementToday++;
+        }
+        
+        // Add to recent responses (keep the 10 most recent)
+        recentResponses.push({
+          experience: experience,
+          artwork: artwork || 'Unknown',
+          emotion: emotion,
+          timestamp: row[timestampColIndex]
+        });
       }
+      
+      // Sort responses by timestamp (most recent first) and take the first 10
+      recentResponses.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      const recent10 = recentResponses.slice(0, 10);
       
       const engagementRate = totalResponsesToday > 0 ? 
         Math.round((totalEngagementToday / totalResponsesToday) * 100) : 0;
       
+      console.log('Processed data:', {
+        artworkVotes,
+        emotionCounts,
+        recentResponses: recent10,
+        totalResponses: totalResponsesToday
+      });
+      
       return {
         artworkVotes,
         emotionCounts,
-        recentResponses,
+        recentResponses: recent10,
         dailyStats: {
           totalResponses: totalResponsesToday,
           engagementRate
@@ -583,6 +603,7 @@
       if (data.dailyStats) {
         updateDailyStats(data);
       }
+
     }
 
     function updateArtworkVotesChart(votesData) {
@@ -785,16 +806,18 @@
     // Function to fetch and display recent responses
     async function fetchRecentResponses() {
       try {
-        const response = await fetch('../data/responses.json');
+        console.log('Fetching recent responses from Google Sheets...');
+        const data = await fetchData(); // Reuse the existing fetchData function
         
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if (!data || !data.recentResponses) {
+          console.warn('No recent responses found');
+          return;
         }
         
-        const data = await response.json();
-        updateRecentResponses(data.recentResponses || []);
+        updateRecentResponses(data.recentResponses);
       } catch (error) {
         console.error('Error fetching recent responses:', error);
+        // Fall back to sample data if there's an error
         updateRecentResponses(getSampleData().recentResponses);
       }
     }
@@ -808,23 +831,164 @@
       
       container.innerHTML = ''; // Clear existing responses
       
+      if (responses.length === 0) {
+        container.innerHTML = '<li class="list-group-item border-0 d-flex justify-content-center ps-0 mb-2 border-radius-lg"><span class="text-sm">No responses yet</span></li>';
+        return;
+      }
+      
       responses.forEach(response => {
         const li = document.createElement('li');
         li.className = 'list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg';
         
-        const time = new Date(response.timestamp).toLocaleTimeString();
+        // Format the timestamp
+        const timestamp = new Date(response.timestamp);
+        const time = timestamp.toLocaleTimeString();
+        const date = timestamp.toLocaleDateString();
+        
+        // Get emotion color
+        const emotionColors = {
+          'happy': 'text-success',
+          'sad': 'text-danger',
+          'nostalgic': 'text-info',
+          'bored': 'text-warning'
+        };
+        const emotionColor = emotionColors[response.emotion] || 'text-dark';
         
         li.innerHTML = `
           <div class="d-flex flex-column">
             <h6 class="mb-1 text-dark font-weight-bold text-sm">${response.experience}</h6>
-            <span class="text-xs">Artwork: ${response.artwork} | Emotion: ${response.emotion}</span>
+            <span class="text-xs">
+              <i class="fas fa-palette me-1"></i> ${response.artwork} 
+              <span class="mx-2">|</span>
+              <i class="fas fa-heart me-1 ${emotionColor}"></i> ${response.emotion}
+            </span>
           </div>
-          <div class="d-flex align-items-center text-sm">
-            ${time}
+          <div class="d-flex align-items-center text-xs text-dark ms-2">
+            <i class="far fa-clock me-1"></i>
+            <span title="${date}">${time}</span>
           </div>
         `;
         
         container.appendChild(li);
+      });
+      
+      // Add View All button functionality
+      const viewAllBtn = document.querySelector('.btn-outline-primary');
+      if (viewAllBtn) {
+        viewAllBtn.onclick = () => {
+          // You can implement view all functionality here
+          console.log('View all responses clicked');
+        };
+      }
+    }
+
+    // Function to process monthly entries data
+    function processMonthlyData(responses) {
+      // Create a map to store counts by month
+      const monthlyData = new Map();
+      
+      // Initialize all months with 0
+      const months = [
+        'January', 'February', 'March', 'April', 
+        'May', 'June', 'July', 'August',
+        'September', 'October', 'November', 'December'
+      ];
+      months.forEach(month => monthlyData.set(month, 0));
+      
+      responses.forEach(response => {
+        const date = new Date(response.timestamp);
+        const monthName = months[date.getMonth()];
+        monthlyData.set(monthName, (monthlyData.get(monthName) || 0) + 1);
+      });
+      
+      // Convert to array format for Chart.js
+      const data = months.map(month => ({
+        month: month,
+        count: monthlyData.get(month) || 0
+      }));
+      
+      return data;
+    }
+
+    // Function to update monthly entries chart
+    function updateMonthlyChart(monthlyData) {
+      const ctx = document.getElementById('weekly-entries-chart').getContext('2d');
+      
+      // Destroy existing chart if it exists
+      if (window.monthlyChart) {
+        window.monthlyChart.destroy();
+      }
+      
+      window.monthlyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: monthlyData.map(d => d.month),
+          datasets: [{
+            label: 'Number of Responses',
+            data: monthlyData.map(d => d.count),
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#4CAF50',
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                color: '#344767'
+              }
+            },
+            title: {
+              display: true,
+              text: 'Monthly Response Frequency',
+              color: '#344767',
+              font: {
+                size: 16
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                drawBorder: false,
+                display: true,
+                drawOnChartArea: true,
+                drawTicks: false,
+                borderDash: [5, 5]
+              },
+              ticks: {
+                stepSize: 1,
+                color: '#344767',
+                padding: 10,
+                callback: function(value) {
+                  return Math.floor(value);
+                }
+              }
+            },
+            x: {
+              grid: {
+                drawBorder: false,
+                display: true,
+                drawOnChartArea: true,
+                drawTicks: false,
+                borderDash: [5, 5]
+              },
+              ticks: {
+                color: '#344767',
+                padding: 10
+              }
+            }
+          }
+        }
       });
     }
   </script>

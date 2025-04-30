@@ -140,20 +140,65 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 20%;
-      background: rgba(0,0,0,0.8);
-      border-top: 2px solid #333;
+      height: 15%;
+      background: linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111),
+                  linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111);
+      background-size: 10px 10px;
+      background-position: 0 0, 5px 5px;
+      border-top: 2px solid rgba(255, 255, 255, 0.1);
       overflow: hidden;
+      position: relative;
+    }
+
+    .ticker-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, 
+        rgba(0,0,0,0.9) 0%,
+        rgba(0,0,0,0.5) 20%,
+        rgba(0,0,0,0.3) 50%,
+        rgba(0,0,0,0.5) 80%,
+        rgba(0,0,0,0.9) 100%
+      );
+      z-index: 1;
     }
     
     .ticker {
       position: absolute;
       white-space: nowrap;
       color: white;
-      font-size: 24px;
+      font-size: 20px;
       line-height: 1.5;
-      padding: 20px;
+      padding: 15px;
       animation: ticker 30s linear infinite;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.05) 0px,
+        rgba(255, 255, 255, 0.05) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      z-index: 2;
+    }
+
+    .ticker span {
+      margin-right: 50px;
+      position: relative;
+    }
+
+    .ticker span::after {
+      content: '•';
+      margin-left: 50px;
+      color: rgba(255, 255, 255, 0.3);
     }
     
     .back-button {
@@ -275,39 +320,142 @@
       }
     }
 
+    // Function to fetch data from Google Sheets
+    async function fetchData() {
+      try {
+        console.log('Fetching data from Google Sheets...');
+        const spreadsheetId = '1HbaoSO3-QHKhYUHy4DuerkH_Z2kV9eoPQOOhTkTWwhQ';
+        const apiKey = 'AIzaSyCOmA67laPyNblmRifkKckoYCZKo8FmyfU';
+        const range = 'Form Responses 1!A:D';
+        
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+        
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        if (!data.values || data.values.length === 0) {
+          throw new Error('No data found in sheet');
+        }
+        
+        return processSheetData(data.values);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        return getSampleData();
+      }
+    }
+
+    // Function to process sheet data
+    function processSheetData(values) {
+      const experienceColIndex = 1; // "How would you describe your experience..."
+      const artworkColIndex = 2;    // "Which artwork stood out to you the most?"
+      const timestampColIndex = 0;   // Timestamp column
+      
+      const emotionCounts = {
+        'happy': 0,
+        'sad': 0,
+        'nostalgic': 0,
+        'bored': 0
+      };
+      
+      const recentResponses = [];
+      
+      // Process all rows (skip header)
+      for (let i = 1; i < values.length; i++) {
+        const row = values[i];
+        const experience = row[experienceColIndex]?.trim() || '';
+        const artwork = row[artworkColIndex]?.trim() || '';
+        const timestamp = row[timestampColIndex];
+        
+        const emotion = classifyEmotion(experience);
+        if (emotionCounts.hasOwnProperty(emotion)) {
+          emotionCounts[emotion]++;
+        }
+        
+        recentResponses.push({
+          experience: experience,
+          artwork: artwork,
+          emotion: emotion,
+          timestamp: timestamp
+        });
+      }
+      
+      // Sort responses by timestamp (most recent first)
+      recentResponses.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      return {
+        emotionCounts,
+        recentResponses
+      };
+    }
+
+    // Function to classify emotion from text
+    function classifyEmotion(text) {
+      text = text.toLowerCase();
+      
+      const happyKeywords = ['happy', 'joy', 'great', 'wonderful', 'amazing', 'love', 'enjoy', 'beautiful', 'excellent', 'fantastic'];
+      const sadKeywords = ['sad', 'crap', 'hate', 'burn','disappoint', 'bad', 'poor', 'unhappy', 'terrible', 'awful', 'horrible'];
+      const nostalgicKeywords = ['nostalgic', 'memory', 'remember', 'childhood', 'past', 'old', 'grandmother', 'grandfather'];
+      const boredKeywords = ['bored', 'boring', 'uninteresting', 'dull', 'tired', 'monotonous'];
+      
+      let counts = {
+        'happy': 0,
+        'sad': 0,
+        'nostalgic': 0,
+        'bored': 0
+      };
+      
+      happyKeywords.forEach(keyword => { if (text.includes(keyword)) counts.happy++; });
+      sadKeywords.forEach(keyword => { if (text.includes(keyword)) counts.sad++; });
+      nostalgicKeywords.forEach(keyword => { if (text.includes(keyword)) counts.nostalgic++; });
+      boredKeywords.forEach(keyword => { if (text.includes(keyword)) counts.bored++; });
+      
+      let maxCount = 0;
+      let maxEmotion = 'sad';
+      
+      for (const emotion in counts) {
+        if (counts[emotion] > maxCount) {
+          maxCount = counts[emotion];
+          maxEmotion = emotion;
+        }
+      }
+      
+      return maxEmotion;
+    }
+
+    // Function to get sample data
+    function getSampleData() {
+      return {
+        emotionCounts: {
+          'happy': 1,
+          'sad': 0,
+          'nostalgic': 0,
+          'bored': 0
+        },
+        recentResponses: [
+          {
+            experience: "Made me so happy!",
+            artwork: "Flower",
+            emotion: "happy",
+            timestamp: new Date().toISOString()
+          }
+        ]
+      };
+    }
+
     // Function to update display
     async function updateDisplay() {
       try {
-        const scriptUrl = 'YOUR_DEPLOYMENT_URL'; // Replace this with your actual deployment URL
-        const response = await fetch(scriptUrl);
-        
-        // If fetch fails, use sample data
-        let data;
-        if (!response.ok) {
-          console.log('Using sample data due to fetch error');
-          data = {
-            emotionCounts: {
-              'happy': 5,
-              'sad': 2,
-              'nostalgic': 3,
-              'bored': 1
-            },
-            recentResponses: [
-              {
-                experience: "I loved the contemporary art exhibition! The colors and textures were absolutely mesmerizing.",
-                artwork: "Untitled No. 7",
-                timestamp: new Date().toISOString()
-              },
-              {
-                experience: "The sculptures were fascinating, especially the way they played with light and shadow.",
-                artwork: "Bronze Series",
-                timestamp: new Date().toISOString()
-              }
-            ]
-          };
-        } else {
-          data = await response.json();
-        }
+        const data = await fetchData();
+        console.log('Fetched data:', data);
         
         // Update emotion display
         const emotionCounts = data.emotionCounts;
@@ -321,31 +469,32 @@
         emotionText.textContent = dominantEmotion.toUpperCase();
         emotionText.className = `emotion-text ${dominantEmotion.toLowerCase()}`;
         
-        // Update artwork display
+        // Update artwork display and recent experience ticker
         const artworkDisplay = document.getElementById('artwork-display');
+        const recentExperience = document.getElementById('recent-experience');
         const responses = data.recentResponses || [];
+        
         if (responses.length > 0) {
           const latestResponse = responses[0];
-          artworkDisplay.textContent = `${latestResponse.artwork} (${new Date(latestResponse.timestamp).toLocaleTimeString()})`;
+          
+          // Update artwork display
+          artworkDisplay.textContent = `Currently Viewing: ${latestResponse.artwork}`;
           artworkDisplay.style.display = 'block';
+          
+          // Update ticker with only the most recent response and its emotion
+          const tickerText = `"${latestResponse.experience}" • Feeling ${latestResponse.emotion}`;
+          recentExperience.textContent = tickerText;
+          recentExperience.className = `recent-experience ${latestResponse.emotion.toLowerCase()}`; // Apply emotion color
+          recentExperience.style.display = 'block';
         } else {
           artworkDisplay.textContent = 'No artwork information available';
-        }
-        
-        // Update recent experience ticker
-        const recentExperience = document.getElementById('recent-experience');
-        if (responses.length > 0) {
-          const tickerText = responses.map(r => 
-            `"${r.experience}"`
-          ).join(' • ');
-          recentExperience.textContent = tickerText || 'No responses yet';
-          recentExperience.style.display = 'block';
+          recentExperience.textContent = 'No responses yet';
         }
         
       } catch (error) {
         console.error('Error updating display:', error);
         // Set default content if there's an error
-        document.getElementById('emotion-icon').textContent = '😊';
+        document.getElementById('emotion-icon').textContent = getEmotionIcon('happy');
         document.getElementById('emotion-text').textContent = 'HAPPY';
         document.getElementById('artwork-display').textContent = 'Unable to load artwork information';
         document.getElementById('recent-experience').textContent = 'Unable to load responses';

@@ -35,10 +35,12 @@
       position: relative;
       width: 100vw;
       height: 100vh;
-      background: linear-gradient(45deg, #1a1a1a, #000);
+      background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
       border: 20px solid #333;
       border-radius: 20px;
-      box-shadow: 0 0 50px rgba(0,0,0,0.5);
+      box-shadow: 
+        0 0 50px rgba(0,0,0,0.5),
+        inset 0 0 20px rgba(255,255,255,0.1);
       overflow: hidden;
     }
 
@@ -50,10 +52,10 @@
       right: 0;
       bottom: 0;
       background: 
-        radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.5) 0%, transparent 70%),
-        radial-gradient(circle at 80% 80%, rgba(65, 105, 225, 0.5) 0%, transparent 70%),
-        radial-gradient(circle at 50% 50%, rgba(255, 105, 180, 0.5) 0%, transparent 70%);
-      animation: gradientShift 8s ease infinite;
+        radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.3) 0%, transparent 70%),
+        radial-gradient(circle at 80% 80%, rgba(65, 105, 225, 0.3) 0%, transparent 70%),
+        radial-gradient(circle at 50% 50%, rgba(255, 105, 180, 0.3) 0%, transparent 70%);
+      animation: gradientShift 15s ease infinite;
       z-index: 0;
     }
 
@@ -121,18 +123,26 @@
     }
     
     .emotion-icon {
-      font-size: 120px;
-      margin-bottom: 20px;
-      animation: bounce 1s ease infinite;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      font-size: 140px;
+      margin-bottom: 30px;
+      animation: bounce 2s ease infinite;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
     }
     
     .emotion-text {
-      font-size: 48px;
-      font-weight: 700;
+      font-size: 56px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 4px;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      letter-spacing: 6px;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+      background: linear-gradient(45deg, #fff, #aaa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      padding: 10px 30px;
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
     }
     
     .ticker-container {
@@ -140,14 +150,15 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 15%;
+      height: 10%;
       background: linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111),
                   linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111);
-      background-size: 10px 10px;
-      background-position: 0 0, 5px 5px;
-      border-top: 2px solid rgba(255, 255, 255, 0.1);
+      background-size: 8px 8px;
+      background-position: 0 0, 4px 4px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       overflow: hidden;
       position: relative;
+      backdrop-filter: blur(5px);
     }
 
     .ticker-container::before {
@@ -158,46 +169,61 @@
       right: 0;
       bottom: 0;
       background: linear-gradient(90deg, 
-        rgba(0,0,0,0.9) 0%,
-        rgba(0,0,0,0.5) 20%,
-        rgba(0,0,0,0.3) 50%,
-        rgba(0,0,0,0.5) 80%,
-        rgba(0,0,0,0.9) 100%
+        rgba(0,0,0,0.95) 0%,
+        rgba(0,0,0,0.7) 20%,
+        rgba(0,0,0,0.5) 50%,
+        rgba(0,0,0,0.7) 80%,
+        rgba(0,0,0,0.95) 100%
       );
       z-index: 1;
+    }
+
+    .ticker-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%,
+        rgba(255,255,255,0.2) 50%,
+        transparent 100%
+      );
+      z-index: 2;
     }
     
     .ticker {
       position: absolute;
       white-space: nowrap;
       color: white;
-      font-size: 20px;
-      line-height: 1.5;
-      padding: 15px;
+      font-size: 18px;
+      line-height: 1.4;
+      padding: 12px;
       animation: ticker 30s linear infinite;
       background: repeating-linear-gradient(
         45deg,
         rgba(255, 255, 255, 0.05) 0px,
-        rgba(255, 255, 255, 0.05) 2px,
-        transparent 2px,
-        transparent 4px
+        rgba(255, 255, 255, 0.05) 1px,
+        transparent 1px,
+        transparent 3px
       );
       -webkit-background-clip: text;
       background-clip: text;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
       font-weight: 500;
       letter-spacing: 0.5px;
       z-index: 2;
     }
 
     .ticker span {
-      margin-right: 50px;
+      margin-right: 40px;
       position: relative;
     }
 
     .ticker span::after {
       content: '•';
-      margin-left: 50px;
+      margin-left: 40px;
       color: rgba(255, 255, 255, 0.3);
     }
     
@@ -206,19 +232,24 @@
       top: 20px;
       left: 20px;
       z-index: 1000;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.6);
       color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 12px 24px;
+      border-radius: 8px;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
       font-size: 16px;
-      transition: background 0.3s;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
     }
     
     .back-button:hover {
       background: rgba(0, 0, 0, 0.8);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
     
     .recent-experience {
@@ -226,19 +257,48 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 20%;
-      background: rgba(0,0,0,0.8);
-      border-top: 2px solid #333;
+      height: 10%;
+      background: rgba(0,0,0,0.9);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       overflow: hidden;
       text-align: left;
       color: white;
-      font-size: 24px;
-      line-height: 1.5;
-      padding: 20px;
+      font-size: 18px;
+      line-height: 1.4;
+      padding: 12px;
       white-space: nowrap;
       animation: ticker 30s linear infinite;
-      font-weight: 400;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      font-weight: 500;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(5px);
+    }
+
+    .recent-experience::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%,
+        rgba(255,255,255,0.2) 50%,
+        transparent 100%
+      );
+    }
+
+    .recent-experience::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%,
+        rgba(255,255,255,0.2) 50%,
+        transparent 100%
+      );
     }
     
     .artwork-display {
@@ -248,14 +308,17 @@
       width: 100%;
       text-align: center;
       color: white;
-      font-size: 28px;
-      font-weight: 600;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.5);
+      font-size: 32px;
+      font-weight: 700;
+      padding: 25px;
+      background: rgba(0, 0, 0, 0.6);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+      border-top: 2px solid rgba(255, 255, 255, 0.15);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(5px);
     }
     
     @keyframes ticker {
@@ -274,19 +337,19 @@
     
     .happy { 
       color: #FFD700;
-      text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+      text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
     }
     .sad { 
       color: #4169E1;
-      text-shadow: 0 0 20px rgba(65, 105, 225, 0.5);
+      text-shadow: 0 0 30px rgba(65, 105, 225, 0.6);
     }
     .nostalgic { 
       color: #FF69B4;
-      text-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+      text-shadow: 0 0 30px rgba(255, 105, 180, 0.6);
     }
     .bored { 
       color: #808080;
-      text-shadow: 0 0 20px rgba(128, 128, 128, 0.5);
+      text-shadow: 0 0 30px rgba(128, 128, 128, 0.6);
     }
   </style>
 </head>
@@ -401,12 +464,12 @@
     function classifyEmotion(text) {
       text = text.toLowerCase();
       
-      const happyKeywords = ['happy', 'joy', 'great', 'wonderful', 'amazing', 'love', 'enjoy', 'beautiful', 'excellent', 'fantastic'];
-      const sadKeywords = ['sad', 'crap', 'hate', 'burn','disappoint', 'bad', 'poor', 'unhappy', 'terrible', 'awful', 'horrible'];
-      const nostalgicKeywords = ['nostalgic', 'memory', 'remember', 'childhood', 'past', 'old', 'grandmother', 'grandfather'];
-      const boredKeywords = ['bored', 'boring', 'uninteresting', 'dull', 'tired', 'monotonous'];
+      const happyKeywords = ['happy', 'joy', 'great', 'wonderful', 'amazing', 'love', 'enjoy', 'beautiful', 'excellent', 'fantastic', 'inspiring', 'uplifting', 'delightful', 'peaceful', 'calm'];
+      const sadKeywords = ['sad', 'disappoint', 'bad', 'poor', 'unhappy', 'terrible', 'awful', 'horrible', 'upset', 'depressed', 'uninspiring', 'disheartening', 'gloomy', 'melancholy'];
+      const nostalgicKeywords = ['nostalgic', 'memory', 'remember', 'childhood', 'past', 'old', 'back then', 'reminisce', 'recall', 'memories', 'youth', 'childhood', 'reminiscent', 'sentimental', 'grandmother', 'grandfather', 'family'];
+      const boredKeywords = ['bored', 'boring', 'uninteresting', 'dull', 'tired', 'monotonous', 'repetitive', 'tedious', 'uninspiring', 'unexciting', 'uninspired', 'unmotivated'];
       
-      let counts = {
+      const counts = {
         'happy': 0,
         'sad': 0,
         'nostalgic': 0,
@@ -419,7 +482,7 @@
       boredKeywords.forEach(keyword => { if (text.includes(keyword)) counts.bored++; });
       
       let maxCount = 0;
-      let maxEmotion = 'sad';
+      let maxEmotion = 'happy';
       
       for (const emotion in counts) {
         if (counts[emotion] > maxCount) {

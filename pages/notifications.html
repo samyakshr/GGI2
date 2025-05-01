@@ -377,6 +377,18 @@
             Hello, world! This is a notification message.
           </div>
         </div>
+        <div class="toast fade hide p-2 bg-white" role="alert" aria-live="assertive" id="newResponseToast" aria-atomic="true">
+          <div class="toast-header border-0">
+            <i class="material-symbols-rounded text-success me-2">notifications</i>
+            <span class="me-auto font-weight-bold">New Response</span>
+            <small class="text-body" id="responseTime">just now</small>
+            <i class="fas fa-times text-md ms-3 cursor-pointer" data-bs-dismiss="toast" aria-label="Close"></i>
+          </div>
+          <hr class="horizontal dark m-0">
+          <div class="toast-body" id="responseDetails">
+            New response received!
+          </div>
+        </div>
       </div>
       <footer class="footer py-4  ">
         <div class="container-fluid">
@@ -504,6 +516,109 @@
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script>
+  <script>
+    // Store the last response timestamp
+    let lastResponseTimestamp = '';
+    
+    // Function to check for new responses
+    async function checkNewResponses() {
+      try {
+        const spreadsheetId = '1HbaoSO3-QHKhYUHy4DuerkH_Z2kV9eoPQOOhTkTWwhQ';
+        const apiKey = 'AIzaSyCOmA67laPyNifkKckoYCZKo8FmyfU';
+        const range = 'Form Responses 1!A:D';
+        
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (!data.values || data.values.length === 0) return;
+        
+        // Get the latest response (excluding header row)
+        const latestResponse = data.values[data.values.length - 1];
+        const timestamp = latestResponse[0];
+        
+        // If this is a new response
+        if (timestamp !== lastResponseTimestamp && lastResponseTimestamp !== '') {
+          // Create notification content
+          const experience = latestResponse[1];
+          const artwork = latestResponse[2];
+          
+          // Show notification
+          const toast = document.getElementById('newResponseToast');
+          const responseTime = document.getElementById('responseTime');
+          const responseDetails = document.getElementById('responseDetails');
+          
+          responseTime.textContent = new Date(timestamp).toLocaleTimeString();
+          responseDetails.innerHTML = `
+            <strong>Artwork:</strong> ${artwork}<br>
+            <strong>Experience:</strong> ${experience}
+          `;
+          
+          // Show the toast notification
+          const bsToast = new bootstrap.Toast(toast);
+          bsToast.show();
+          
+          // Add to notifications dropdown
+          addToNotificationsDropdown(timestamp, artwork, experience);
+        }
+        
+        // Update the last response timestamp
+        lastResponseTimestamp = timestamp;
+        
+      } catch (error) {
+        console.error('Error checking for new responses:', error);
+      }
+    }
+    
+    // Function to add notification to dropdown
+    function addToNotificationsDropdown(timestamp, artwork, experience) {
+      const dropdown = document.querySelector('[aria-labelledby="dropdownMenuButton"]');
+      if (!dropdown) return;
+      
+      // Create new notification item
+      const li = document.createElement('li');
+      li.className = 'mb-2';
+      
+      const formattedTime = new Date(timestamp).toLocaleTimeString();
+      
+      li.innerHTML = `
+        <a class="dropdown-item border-radius-md" href="javascript:;">
+          <div class="d-flex py-1">
+            <div class="avatar avatar-sm bg-gradient-secondary me-3 my-auto">
+              <i class="material-symbols-rounded">palette</i>
+            </div>
+            <div class="d-flex flex-column justify-content-center">
+              <h6 class="text-sm font-weight-normal mb-1">
+                New response for "${artwork}"
+              </h6>
+              <p class="text-xs text-secondary mb-0">
+                <i class="fa fa-clock me-1"></i>
+                ${formattedTime}
+              </p>
+            </div>
+          </div>
+        </a>
+      `;
+      
+      // Add to the beginning of the list
+      dropdown.insertBefore(li, dropdown.firstChild);
+      
+      // Remove oldest notification if more than 5
+      if (dropdown.children.length > 5) {
+        dropdown.removeChild(dropdown.lastChild);
+      }
+    }
+    
+    // Check for new responses every 30 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initial check
+      checkNewResponses();
+      
+      // Set up periodic checks
+      setInterval(checkNewResponses, 30000);
+    });
+  </script>
 </body>
 
 </html>

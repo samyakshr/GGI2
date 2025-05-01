@@ -179,78 +179,24 @@
                   <h6 class="mb-0">Recent Responses</h6>
                 </div>
                 <div class="col-6 text-end">
-                  <button class="btn btn-outline-primary btn-sm mb-0">View All</button>
-              </div>
+                  <button class="btn btn-outline-primary btn-sm mb-0" onclick="showAllResponses()">View All</button>
+                </div>
               </div>
             </div>
             <div class="card-body p-3 pb-0">
               <ul class="list-group" id="recent-responses">
                 <!-- Recent responses will be added here dynamically -->
               </ul>
+            </div>
           </div>
         </div>
-          <div class="card h-100 mt-4">
-            <div class="card-header pb-0 p-3">
-              <div class="row">
-                <div class="col-6 d-flex align-items-center">
-                  <h6 class="mb-0">Daily Statistics</h6>
-                </div>
-                <div class="col-6 text-end">
-                  <span class="text-sm font-weight-bold">Today</span>
-                  </div>
-                </div>
-              </div>
-            <div class="card-body p-3">
-              <div class="row">
-                <div class="col-6">
-                  <div class="card bg-gradient-dark shadow-xl">
-                    <div class="card-body p-3">
-                      <div class="row">
-                        <div class="col-8">
-                          <div class="numbers">
-                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Responses</p>
-                            <h5 class="font-weight-bolder mb-0" id="total-responses">0</h5>
-            </div>
-                          </div>
-                        <div class="col-4 text-end">
-                          <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                            <i class="material-symbols-rounded text-lg opacity-10" aria-hidden="true">people</i>
-                          </div>
-                        </div>
-                        </div>
-                            </div>
-                          </div>
-                          </div>
-                <div class="col-6">
-                  <div class="card bg-gradient-dark shadow-xl">
-            <div class="card-body p-3">
-                      <div class="row">
-                        <div class="col-8">
-                          <div class="numbers">
-                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Engagement Rate</p>
-                            <h5 class="font-weight-bolder mb-0" id="engagement-rate">0%</h5>
-                  </div>
-                </div>
-                        <div class="col-4 text-end">
-                          <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                            <i class="material-symbols-rounded text-lg opacity-10" aria-hidden="true">trending_up</i>
-                  </div>
-                </div>
-                  </div>
-                </div>
-                  </div>
-                </div>
-                  </div>
-                </div>
-                  </div>
-                </div>
-              </div>
+      </div>
     </div>
     <div class="row mt-4">
       <div class="col-12">
         <div class="card">
           <div class="card-header p-3">
-            <h5 class="mb-0">Weekly Response Frequency</h5>
+            <h5 class="mb-0">Monthly Response Frequency</h5>
           </div>
           <div class="card-body p-3">
             <div class="chart">
@@ -260,7 +206,92 @@
         </div>
       </div>
     </div>
+    <div class="row mt-4">
+      <div class="col-lg-6 mb-lg-0 mb-4">
+        <div class="card">
+          <div class="card-header p-3">
+            <h5 class="mb-0">Emotion Distribution Over Time</h5>
+          </div>
+          <div class="card-body p-3">
+            <div class="chart">
+              <canvas id="emotion-time-chart" class="chart-canvas" height="300"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 mb-lg-0 mb-4">
+        <div class="card">
+          <div class="card-header p-3">
+            <h5 class="mb-0">Artwork Popularity by Emotion</h5>
+          </div>
+          <div class="card-body p-3">
+            <div class="chart">
+              <canvas id="artwork-emotion-chart" class="chart-canvas" height="300"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-lg-6 mb-lg-0 mb-4">
+        <div class="card">
+          <div class="card-header p-3">
+            <h5 class="mb-0">Response Time Analysis</h5>
+          </div>
+          <div class="card-body p-3">
+            <div class="chart">
+              <canvas id="time-heatmap" class="chart-canvas" height="300"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 mb-lg-0 mb-4">
+        <div class="card">
+          <div class="card-header p-3">
+            <h5 class="mb-0">Engagement Score</h5>
+          </div>
+          <div class="card-body p-3">
+            <div class="chart">
+              <canvas id="engagement-gauge" class="chart-canvas" height="300"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
+  
+  <!-- Add Modal for All Responses -->
+  <div class="modal fade" id="allResponsesModal" tabindex="-1" role="dialog" aria-labelledby="allResponsesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="allResponsesModalLabel">All Responses</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Timestamp</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Experience</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Artwork</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Emotion</th>
+                </tr>
+              </thead>
+              <tbody id="allResponsesTable">
+                <!-- Responses will be dynamically added here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
       <i class="material-symbols-rounded py-2">settings</i>
@@ -341,10 +372,133 @@
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/chartjs.min.js"></script>
+  <!-- Add Chart.js plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.2.0/dist/chartjs-chart-matrix.min.js"></script>
   <script>
-    // Store chart instances
+    // Store chart instances and responses
     let artworkChart = null;
     let emotionChart = null;
+    let emotionTimeChart = null;
+    let artworkEmotionChart = null;
+    let timeHeatmap = null;
+    let engagementGauge = null;
+    let allResponses = [];
+    let responseModal = null;
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, initializing components...');
+      // Initialize the modal
+      const modalElement = document.getElementById('allResponsesModal');
+      if (modalElement) {
+        responseModal = new bootstrap.Modal(modalElement);
+        console.log('Modal initialized');
+      } else {
+        console.error('Modal element not found');
+      }
+      
+      // Initial update
+      updateCharts();
+      
+      // Update every 30 seconds
+      setInterval(updateCharts, 30000);
+    });
+
+    // Function to show all responses in modal
+    async function showAllResponses() {
+      try {
+        console.log('Showing all responses...');
+        if (!responseModal) {
+          const modalElement = document.getElementById('allResponsesModal');
+          if (!modalElement) {
+            console.error('Modal element not found');
+            return;
+          }
+          responseModal = new bootstrap.Modal(modalElement);
+        }
+
+        const tableBody = document.getElementById('allResponsesTable');
+        if (!tableBody) {
+          console.error('Table body element not found');
+          return;
+        }
+
+        // Clear existing table content
+        tableBody.innerHTML = '';
+
+        // If we don't have the data yet, fetch it
+        if (allResponses.length === 0) {
+          console.log('Fetching all responses...');
+          const data = await fetchData();
+          if (data && Array.isArray(data.recentResponses)) {
+            allResponses = data.recentResponses;
+          }
+        }
+
+        console.log('Processing responses:', allResponses);
+
+        // Sort responses by timestamp (most recent first)
+        allResponses.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        // Add each response to the table
+        allResponses.forEach(response => {
+          const row = document.createElement('tr');
+          
+          // Format the timestamp
+          const date = new Date(response.timestamp);
+          const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+          
+          // Get emotion color
+          const emotionColors = {
+            'happy': 'text-success',
+            'sad': 'text-danger',
+            'nostalgic': 'text-info',
+            'bored': 'text-warning'
+          };
+          const emotionColor = emotionColors[response.emotion] || 'text-dark';
+          
+          row.innerHTML = `
+            <td>
+              <div class="d-flex px-2 py-1">
+                <div class="d-flex flex-column justify-content-center">
+                  <h6 class="mb-0 text-sm">${formattedDate}</h6>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex px-2 py-1">
+                <div class="d-flex flex-column justify-content-center">
+                  <p class="text-xs text-secondary mb-0">${response.experience}</p>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex px-2 py-1">
+                <div class="d-flex flex-column justify-content-center">
+                  <h6 class="mb-0 text-sm">${response.artwork}</h6>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex px-2 py-1">
+                <div class="d-flex flex-column justify-content-center">
+                  <span class="badge badge-sm bg-gradient-${emotionColor}">${response.emotion}</span>
+                </div>
+              </div>
+            </td>
+          `;
+          
+          tableBody.appendChild(row);
+        });
+
+        // Show the modal
+        console.log('Showing modal');
+        responseModal.show();
+
+      } catch (error) {
+        console.error('Error showing all responses:', error);
+      }
+    }
 
     // Function to fetch data from Google Sheets
     async function fetchData() {
@@ -385,6 +539,57 @@
       }
     }
 
+    // Function to classify emotion from text
+    function classifyEmotion(text) {
+      if (!text) return 'happy'; // Default case
+      
+      text = text.toLowerCase();
+      console.log('Classifying emotion for text:', text);
+      
+      const emotionKeywords = {
+        happy: ['happy', 'joy', 'great', 'wonderful', 'amazing', 'love', 'enjoy', 'beautiful', 'excellent', 'fantastic', 'inspiring', 'uplifting', 'delightful', 'peaceful', 'calm', 'good', 'nice', 'liked', 'interesting'],
+        
+        sad: ['sad', 'disappoint', 'bad', 'poor', 'unhappy', 'terrible', 'awful', 'horrible', 'upset', 'depressed', 'uninspiring', 'disheartening', 'gloomy', 'melancholy', 'dislike', 'unfortunate', 'worse'],
+        
+        nostalgic: ['nostalgic', 'memory', 'remember', 'childhood', 'past', 'old', 'back then', 'reminisce', 'recall', 'memories', 'youth', 'reminiscent', 'sentimental', 'grandmother', 'grandfather', 'family', 'reminded', 'remind', 'used to'],
+        
+        bored: ['bored', 'boring', 'uninteresting', 'dull', 'tired', 'monotonous', 'repetitive', 'tedious', 'uninspiring', 'unexciting', 'plain', 'ordinary', 'meh', 'whatever', 'nothing special']
+      };
+      
+      const scores = {
+        happy: 0,
+        sad: 0,
+        nostalgic: 0,
+        bored: 0
+      };
+      
+      // Calculate scores for each emotion
+      Object.entries(emotionKeywords).forEach(([emotion, keywords]) => {
+        keywords.forEach(keyword => {
+          if (text.includes(keyword)) {
+            scores[emotion]++;
+            console.log(`Found keyword "${keyword}" for emotion "${emotion}"`);
+          }
+        });
+      });
+      
+      console.log('Emotion scores:', scores);
+      
+      // Find emotion with highest score
+      let maxScore = 0;
+      let classifiedEmotion = 'happy'; // Default
+      
+      Object.entries(scores).forEach(([emotion, score]) => {
+        if (score > maxScore) {
+          maxScore = score;
+          classifiedEmotion = emotion;
+        }
+      });
+      
+      console.log('Classified emotion:', classifiedEmotion);
+      return classifiedEmotion;
+    }
+
     // Function to process sheet data
     function processSheetData(values) {
       if (!values || values.length === 0) {
@@ -392,16 +597,18 @@
       }
       
       const headers = values[0];
-      // Update column indices based on your actual Google Sheet headers
-      const experienceColIndex = 1; // "How would you describe your experience..."
-      const artworkColIndex = 2;    // "Which artwork stood out to you the most?"
-      const timestampColIndex = 0;   // Timestamp column
+      const experienceColIndex = 1;
+      const artworkColIndex = 2;
+      const timestampColIndex = 0;
+      
+      // Store all responses for the View All functionality
+      allResponses = [];
       
       const artworkVotes = {
-        'Tree': 0,
-        'Flower': 0,
-        'Swing': 0,
-        'House': 0
+        'Measuring the Universe': 0,
+        'Think Far': 0,
+        'From Wind to Rivers to the Abyssal Plain': 0,
+        'Eleven Columns': 0
       };
       
       const emotionCounts = {
@@ -411,37 +618,27 @@
         'bored': 0
       };
       
-      const recentResponses = [];
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      let totalResponsesToday = 0;
-      let totalEngagementToday = 0;
-      
-      // Process all rows (including those not from today for testing)
+      // Process all rows except header
       for (let i = 1; i < values.length; i++) {
         const row = values[i];
-        const timestamp = new Date(row[timestampColIndex]);
         const experience = row[experienceColIndex]?.trim() || '';
         const artwork = row[artworkColIndex]?.trim() || '';
         
-        // Count all responses
-        totalResponsesToday++;
-        
+        // Count artwork votes
         if (artwork && artworkVotes.hasOwnProperty(artwork)) {
           artworkVotes[artwork]++;
+          console.log(`Counted vote for artwork: ${artwork}`);
         }
         
         const emotion = classifyEmotion(experience);
+        console.log(`Row ${i} - Experience: "${experience}" classified as: ${emotion}`);
+        
         if (emotionCounts.hasOwnProperty(emotion)) {
           emotionCounts[emotion]++;
         }
         
-        if (emotion === 'happy' || emotion === 'nostalgic') {
-          totalEngagementToday++;
-        }
-        
-        // Add to recent responses (keep the 10 most recent)
-        recentResponses.push({
+        // Add to recent responses
+        allResponses.push({
           experience: experience,
           artwork: artwork || 'Unknown',
           emotion: emotion,
@@ -449,87 +646,31 @@
         });
       }
       
-      // Sort responses by timestamp (most recent first) and take the first 10
-      recentResponses.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-      const recent10 = recentResponses.slice(0, 10);
+      console.log('Final artwork votes:', artworkVotes);
+      console.log('Final emotion counts:', emotionCounts);
       
-      const engagementRate = totalResponsesToday > 0 ? 
-        Math.round((totalEngagementToday / totalResponsesToday) * 100) : 0;
-      
-      console.log('Processed data:', {
-        artworkVotes,
-        emotionCounts,
-        recentResponses: recent10,
-        totalResponses: totalResponsesToday
-      });
+      // Sort responses by timestamp (most recent first)
+      allResponses.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      const recent10 = allResponses.slice(0, 10);
       
       return {
         artworkVotes,
         emotionCounts,
         recentResponses: recent10,
         dailyStats: {
-          totalResponses: totalResponsesToday,
-          engagementRate
+          totalResponses: values.length - 1,
+          engagementRate: Math.round(((emotionCounts.happy + emotionCounts.nostalgic) / (values.length - 1)) * 100)
         }
       };
     }
-
-    // Function to classify emotion from text
-    function classifyEmotion(text) {
-      text = text.toLowerCase();
-      
-      const happyKeywords = ['happy', 'joy', 'great', 'wonderful', 'amazing', 'love', 'enjoy', 'beautiful', 'excellent', 'fantastic', 'inspiring', 'uplifting', 'delightful', 'peaceful', 'calm'];
-      const sadKeywords = ['sad', 'disappoint', 'bad', 'poor', 'unhappy', 'terrible', 'awful', 'horrible', 'upset', 'depressed', 'uninspiring', 'disheartening', 'gloomy', 'melancholy'];
-      const nostalgicKeywords = ['nostalgic', 'memory', 'remember', 'childhood', 'past', 'old', 'back then', 'reminisce', 'recall', 'memories', 'youth', 'childhood', 'reminiscent', 'sentimental', 'grandmother', 'grandfather', 'family'];
-      const boredKeywords = ['bored', 'boring', 'uninteresting', 'dull', 'tired', 'monotonous', 'repetitive', 'tedious', 'uninspiring', 'unexciting', 'uninspired', 'unmotivated'];
-      
-      const counts = {
-        'happy': 0,
-        'sad': 0,
-        'nostalgic': 0,
-        'bored': 0
-      };
-      
-      happyKeywords.forEach(keyword => { if (text.includes(keyword)) counts.happy++; });
-      sadKeywords.forEach(keyword => { if (text.includes(keyword)) counts.sad++; });
-      nostalgicKeywords.forEach(keyword => { if (text.includes(keyword)) counts.nostalgic++; });
-      boredKeywords.forEach(keyword => { if (text.includes(keyword)) counts.bored++; });
-      
-      let maxCount = 0;
-      let maxEmotion = 'happy';
-      
-      for (const emotion in counts) {
-        if (counts[emotion] > maxCount) {
-          maxCount = counts[emotion];
-          maxEmotion = emotion;
-        }
-      }
-      
-      return maxEmotion;
-    }
-
-    // Wait for the DOM to be fully loaded before initializing charts
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('DOM loaded, initializing dashboard...');
-      
-      // Initialize charts immediately
-      updateCharts();
-      fetchRecentResponses();
-      
-      // Update every 30 seconds
-      setInterval(() => {
-        updateCharts();
-        fetchRecentResponses();
-      }, 30000);
-    });
 
     function getSampleData() {
       return {
         artworkVotes: {
-          'Tree': 0,
-          'Flower': 1,
-          'Swing': 1,
-          'House': 1
+          'Measuring the Universe': 0,
+          'Think Far': 1,
+          'From Wind to Rivers to the Abyssal Plain': 1,
+          'Eleven Columns': 1
         },
         emotionCounts: {
           'happy': 1,
@@ -540,19 +681,19 @@
         recentResponses: [
           {
             experience: "Made me so happy!",
-            artwork: "Flower",
+            artwork: "Think Far",
             emotion: "happy",
             timestamp: "4/15/2025 13:17:52"
           },
           {
             experience: "Dissappointing",
-            artwork: "Swing",
+            artwork: "From Wind to Rivers to the Abyssal Plain",
             emotion: "sad",
             timestamp: "4/15/2025 13:18:04"
           },
           {
             experience: "Reminded me of my grandmother",
-            artwork: "House",
+            artwork: "Eleven Columns",
             emotion: "nostalgic",
             timestamp: "4/15/2025 13:18:17"
           }
@@ -565,264 +706,490 @@
     }
 
     // Function to update daily statistics
-    function updateDailyStats(data) {
+    function updateDailyStats(dailyStats) {
+      console.log('Updating daily stats with:', dailyStats);
       const totalResponsesElement = document.getElementById('total-responses');
       const engagementRateElement = document.getElementById('engagement-rate');
       
       if (totalResponsesElement) {
-        totalResponsesElement.textContent = data.dailyStats.totalResponses;
+        totalResponsesElement.textContent = dailyStats.totalResponses || 0;
       }
       
       if (engagementRateElement) {
-        engagementRateElement.textContent = `${data.dailyStats.engagementRate}%`;
+        engagementRateElement.textContent = `${dailyStats.engagementRate || 0}%`;
       }
     }
 
-    // Function to update charts with new data
-    async function updateCharts() {
-      console.log('Updating charts...');
-      const data = await fetchData();
-      console.log('Data for charts:', data);
+    // Function to process time-based emotion data
+    function processTimeEmotionData(responses) {
+      const timeSlots = Array.from({length: 24}, (_, i) => i);
+      const emotions = ['happy', 'sad', 'nostalgic', 'bored'];
+      const data = {};
       
-      if (!data) {
-        console.error('No data received');
-        return;
-      }
+      emotions.forEach(emotion => {
+        data[emotion] = timeSlots.map(hour => {
+          return responses.filter(r => {
+            const responseHour = new Date(r.timestamp).getHours();
+            return responseHour === hour && r.emotion === emotion;
+          }).length;
+        });
+      });
       
-      // Update artwork votes chart
-      if (data.artworkVotes) {
-        updateArtworkVotesChart(data.artworkVotes);
-      }
-      
-      // Update emotion analysis chart
-      if (data.emotionCounts) {
-        updateEmotionChart(data.emotionCounts);
-      }
-
-      // Update daily statistics
-      if (data.dailyStats) {
-        updateDailyStats(data);
-      }
-
+      return data;
     }
 
+    // Function to process artwork-emotion data
+    function processArtworkEmotionData(responses) {
+      console.log('Processing artwork-emotion data from responses:', responses);
+      
+      const data = {};
+      const emotions = ['happy', 'sad', 'nostalgic', 'bored'];
+      
+      // Initialize data structure for each emotion
+      emotions.forEach(emotion => {
+        data[emotion] = {
+          'Measuring the Universe': 0,
+          'Think Far': 0,
+          'From Wind to Rivers to the Abyssal Plain': 0,
+          'Eleven Columns': 0
+        };
+      });
+      
+      // Count responses for each artwork-emotion combination
+      responses.forEach(response => {
+        if (response.artwork && response.emotion) {
+          data[response.emotion][response.artwork]++;
+        }
+      });
+      
+      console.log('Processed artwork-emotion data:', data);
+      return data;
+    }
+
+    // Function to update emotion time chart
+    function updateEmotionTimeChart(data) {
+      const ctx = document.getElementById('emotion-time-chart');
+      if (!ctx) return;
+      
+      if (emotionTimeChart) {
+        emotionTimeChart.destroy();
+      }
+      
+      const colors = {
+        happy: '#4CAF50',
+        sad: '#F44336',
+        nostalgic: '#2196F3',
+        bored: '#FFC107'
+      };
+      
+      emotionTimeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+          datasets: Object.entries(data).map(([emotion, values]) => ({
+            label: emotion.charAt(0).toUpperCase() + emotion.slice(1),
+            data: values,
+            borderColor: colors[emotion],
+            backgroundColor: `${colors[emotion]}20`,
+            tension: 0.4,
+            fill: true
+          }))
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Function to update artwork-emotion chart
+    function updateArtworkEmotionChart(data) {
+      const ctx = document.getElementById('artwork-emotion-chart');
+      if (!ctx) return;
+      
+      if (artworkEmotionChart) {
+        artworkEmotionChart.destroy();
+      }
+      
+      const emotions = Object.keys(data);
+      const artworks = Object.keys(data[emotions[0]]);
+      const colors = {
+        'Tree': '#4CAF50',    // Green
+        'Flower': '#F44336',  // Red
+        'Swing': '#2196F3',   // Blue
+        'House': '#FFC107'    // Yellow
+      };
+      
+      artworkEmotionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: emotions.map(e => e.charAt(0).toUpperCase() + e.slice(1)),
+          datasets: artworks.map(artwork => ({
+            label: artwork,
+            data: emotions.map(emotion => data[emotion][artwork]),
+            backgroundColor: colors[artwork],
+            borderColor: colors[artwork],
+            borderWidth: 1
+          }))
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Artwork Popularity by Emotion'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              },
+              title: {
+                display: true,
+                text: 'Number of Responses'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Emotions'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Function to update time heatmap
+    function updateTimeHeatmap(responses) {
+      const ctx = document.getElementById('time-heatmap');
+      if (!ctx) return;
+      
+      if (timeHeatmap) {
+        timeHeatmap.destroy();
+      }
+      
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const hours = Array.from({length: 24}, (_, i) => `${i}:00`);
+      
+      // Create a 2D array filled with zeros
+      const data = Array(7).fill().map(() => Array(24).fill(0));
+      
+      // Fill the data array with response counts
+      responses.forEach(response => {
+        const date = new Date(response.timestamp);
+        const day = date.getDay();
+        const hour = date.getHours();
+        data[day][hour]++;
+      });
+      
+      // Convert 2D array to the format expected by the matrix chart
+      const chartData = [];
+      for (let i = 0; i < 7; i++) {
+        for (let j = 0; j < 24; j++) {
+          chartData.push({
+            x: j,
+            y: i,
+            v: data[i][j]
+          });
+        }
+      }
+      
+      timeHeatmap = new Chart(ctx, {
+        type: 'matrix',
+        data: {
+          datasets: [{
+            data: chartData,
+            backgroundColor(context) {
+              const value = context.dataset.data[context.dataIndex].v;
+              const maxValue = Math.max(...chartData.map(d => d.v));
+              const alpha = maxValue > 0 ? value / maxValue : 0;
+              return `rgba(76, 175, 80, ${alpha})`;
+            },
+            borderWidth: 1,
+            borderColor: '#ffffff',
+            width: ({chart}) => (chart.chartArea || {}).width / 24 - 1,
+            height: ({chart}) => (chart.chartArea || {}).height / 7 - 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                title(context) {
+                  const point = context[0].raw;
+                  return `${days[point.y]}, ${hours[point.x]}`;
+                },
+                label(context) {
+                  return `Responses: ${context.raw.v}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              type: 'category',
+              labels: hours,
+              offset: true,
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              type: 'category',
+              labels: days,
+              offset: true,
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Function to update engagement gauge
+    function updateEngagementGauge(engagementRate) {
+      const ctx = document.getElementById('engagement-gauge');
+      if (!ctx) return;
+      
+      if (engagementGauge) {
+        engagementGauge.destroy();
+      }
+      
+      engagementGauge = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Engaged', 'Not Engaged'],
+          datasets: [{
+            data: [engagementRate, 100 - engagementRate],
+            backgroundColor: ['#4CAF50', '#E0E0E0'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '80%',
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              enabled: true,
+              callbacks: {
+                label: function(context) {
+                  return `${context.label}: ${context.raw}%`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Function to update artwork votes chart
     function updateArtworkVotesChart(votesData) {
       console.log('Updating artwork votes chart with:', votesData);
-      const canvas = document.getElementById("artwork-chart");
-      if (!canvas) {
+      const ctx = document.getElementById("artwork-chart");
+      if (!ctx) {
         console.error('Could not find artwork-chart element');
         return;
       }
 
-      // Destroy existing chart if it exists
       if (artworkChart) {
         artworkChart.destroy();
       }
       
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        console.error('Could not get 2D context for artwork chart');
-        return;
-      }
+      const labels = [
+        'Measuring the Universe',
+        'Think Far',
+        'From Wind to Rivers to the Abyssal Plain',
+        'Eleven Columns'
+      ];
       
-      const labels = Object.keys(votesData);
-      const data = Object.values(votesData);
+      // Ensure we have data for each artwork
+      const data = labels.map(label => {
+        const value = votesData[label] || 0;
+        console.log(`Artwork: ${label}, Votes: ${value}`);
+        return value;
+      });
       
       console.log('Creating artwork chart with labels:', labels, 'and data:', data);
       
       artworkChart = new Chart(ctx, {
-      type: "bar",
-      data: {
+        type: "bar",
+        data: {
           labels: labels,
-        datasets: [{
+          datasets: [{
             label: "Votes",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "#43A047",
+            tension: 0.4,
+            borderWidth: 0,
+            borderRadius: 4,
+            borderSkipped: false,
+            backgroundColor: "#43A047",
             data: data,
-          barThickness: 'flex'
+            maxBarThickness: 50
           }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false,
             },
             title: {
               display: true,
               text: 'Most Popular Artworks'
-          }
-        },
-        scales: {
-          y: {
-              beginAtZero: true,
-              min: 0,
-              max: 50,
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: '#e5e5e5'
-            },
-            ticks: {
-              suggestedMin: 0,
-                suggestedMax: 50,
-                stepSize: 5,
-              padding: 10,
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
-              color: "#737373"
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 14,
-                lineHeight: 2
-              },
             }
           },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                drawBorder: false,
+                display: true,
+                drawOnChartArea: true,
+                drawTicks: false,
+                borderDash: [5, 5]
+              },
+              ticks: {
+                suggestedMin: 0,
+                suggestedMax: 20,
+                stepSize: 1,
+                padding: 10,
+                color: "#737373"
+              },
+            },
+            x: {
+              grid: {
+                drawBorder: false,
+                display: false,
+                drawOnChartArea: false,
+                drawTicks: false
+              },
+              ticks: {
+                display: true,
+                color: '#737373',
+                padding: 10,
+                font: {
+                  size: 10
+                },
+                maxRotation: 45,
+                minRotation: 45
+              }
+            },
+          },
         },
-      },
-    });
+      });
     }
 
+    // Function to update emotion chart
     function updateEmotionChart(emotionData) {
       console.log('Updating emotion chart with:', emotionData);
-      const canvas = document.getElementById("emotion-chart");
-      if (!canvas) {
+      const ctx = document.getElementById("emotion-chart");
+      if (!ctx) {
         console.error('Could not find emotion-chart element');
         return;
       }
 
-      // Destroy existing chart if it exists
       if (emotionChart) {
         emotionChart.destroy();
       }
       
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        console.error('Could not get 2D context for emotion chart');
-        return;
-      }
-      
       emotionChart = new Chart(ctx, {
-        type: "bar",
-      data: {
+        type: "line",
+        data: {
           labels: Object.keys(emotionData),
-        datasets: [{
+          datasets: [{
             label: "Emotion Analysis",
-          tension: 0,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: "#43A047",
-          pointBorderColor: "transparent",
-          borderColor: "#43A047",
-          backgroundColor: "transparent",
-          fill: true,
+            tension: 0.4,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: "#43A047",
+            pointBorderColor: "transparent",
+            borderColor: "#43A047",
+            backgroundColor: "rgba(67, 160, 71, 0.1)",
+            fill: true,
             data: Object.values(emotionData),
-          maxBarThickness: 6
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
+            maxBarThickness: 6
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false,
+            },
             title: {
               display: true,
               text: 'Visitor Emotions Analysis'
             }
           },
-        scales: {
-          y: {
+          scales: {
+            y: {
               beginAtZero: true,
-              min: 0,
-              max: 50,
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [4, 4],
-              color: '#e5e5e5'
-            },
-            ticks: {
+              grid: {
+                drawBorder: false,
+                display: true,
+                drawOnChartArea: true,
+                drawTicks: false,
+                borderDash: [4, 4]
+              },
+              ticks: {
                 suggestedMin: 0,
                 suggestedMax: 50,
                 stepSize: 5,
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 12,
-                lineHeight: 2
-              },
-            }
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
+                display: true,
+                padding: 10
+              }
             },
-            ticks: {
-              display: true,
-              color: '#737373',
-              padding: 10,
-              font: {
-                size: 12,
-                lineHeight: 2
+            x: {
+              grid: {
+                drawBorder: false,
+                display: false,
+                drawOnChartArea: false,
+                drawTicks: false
               },
-            }
+              ticks: {
+                display: true,
+                padding: 10
+              }
+            },
           },
         },
-      },
-    });
+      });
     }
 
-    // Function to fetch and display recent responses
-    async function fetchRecentResponses() {
-      try {
-        console.log('Fetching recent responses from Google Sheets...');
-        const data = await fetchData(); // Reuse the existing fetchData function
-        
-        if (!data || !data.recentResponses) {
-          console.warn('No recent responses found');
-          return;
-        }
-        
-        updateRecentResponses(data.recentResponses);
-      } catch (error) {
-        console.error('Error fetching recent responses:', error);
-        // Fall back to sample data if there's an error
-        updateRecentResponses(getSampleData().recentResponses);
-      }
-    }
-
+    // Function to update recent responses
     function updateRecentResponses(responses) {
+      console.log('Updating recent responses:', responses);
       const container = document.getElementById('recent-responses');
       if (!container) {
         console.error('Could not find recent-responses element');
@@ -831,18 +1198,18 @@
       
       container.innerHTML = ''; // Clear existing responses
       
-      if (responses.length === 0) {
+      if (!responses || responses.length === 0) {
         container.innerHTML = '<li class="list-group-item border-0 d-flex justify-content-center ps-0 mb-2 border-radius-lg"><span class="text-sm">No responses yet</span></li>';
         return;
       }
       
-      responses.forEach(response => {
+      responses.slice(0, 10).forEach(response => {
         const li = document.createElement('li');
         li.className = 'list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg';
         
         // Format the timestamp
         const timestamp = new Date(response.timestamp);
-        const time = timestamp.toLocaleTimeString();
+        const time = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const date = timestamp.toLocaleDateString();
         
         // Get emotion color
@@ -871,15 +1238,42 @@
         
         container.appendChild(li);
       });
+    }
+
+    // Function to update charts with new data
+    async function updateCharts() {
+      console.log('Updating charts...');
+      const data = await fetchData();
+      console.log('Data for charts:', data);
       
-      // Add View All button functionality
-      const viewAllBtn = document.querySelector('.btn-outline-primary');
-      if (viewAllBtn) {
-        viewAllBtn.onclick = () => {
-          // You can implement view all functionality here
-          console.log('View all responses clicked');
-        };
+      if (!data) {
+        console.error('No data received');
+        return;
       }
+      
+      // Update existing charts
+      if (data.artworkVotes) {
+        updateArtworkVotesChart(data.artworkVotes);
+      }
+      
+      if (data.emotionCounts) {
+        updateEmotionChart(data.emotionCounts);
+      }
+
+      // Update recent responses
+      if (data.recentResponses) {
+        updateRecentResponses(data.recentResponses);
+      }
+
+      // Update new charts
+      const timeEmotionData = processTimeEmotionData(data.recentResponses);
+      updateEmotionTimeChart(timeEmotionData);
+      
+      const artworkEmotionData = processArtworkEmotionData(data.recentResponses);
+      updateArtworkEmotionChart(artworkEmotionData);
+      
+      updateTimeHeatmap(data.recentResponses);
+      updateEngagementGauge(data.dailyStats?.engagementRate || 0);
     }
 
     // Function to process monthly entries data
@@ -921,25 +1315,25 @@
       
       window.monthlyChart = new Chart(ctx, {
         type: 'line',
-        data: {
+      data: {
           labels: monthlyData.map(d => d.month),
-          datasets: [{
+        datasets: [{
             label: 'Number of Responses',
             data: monthlyData.map(d => d.count),
             borderColor: '#4CAF50',
             backgroundColor: 'rgba(76, 175, 80, 0.1)',
             tension: 0.4,
-            fill: true,
+          fill: true,
             pointBackgroundColor: '#4CAF50',
             pointRadius: 4,
             pointHoverRadius: 6
           }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
               display: true,
               position: 'top',
               labels: {
@@ -954,35 +1348,35 @@
                 size: 16
               }
             }
-          },
-          scales: {
-            y: {
+        },
+        scales: {
+          y: {
               beginAtZero: true,
-              grid: {
-                drawBorder: false,
-                display: true,
-                drawOnChartArea: true,
-                drawTicks: false,
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
                 borderDash: [5, 5]
-              },
-              ticks: {
+            },
+            ticks: {
                 stepSize: 1,
                 color: '#344767',
-                padding: 10,
+              padding: 10,
                 callback: function(value) {
                   return Math.floor(value);
                 }
-              }
-            },
-            x: {
-              grid: {
-                drawBorder: false,
+            }
+          },
+          x: {
+            grid: {
+              drawBorder: false,
                 display: true,
                 drawOnChartArea: true,
-                drawTicks: false,
+              drawTicks: false,
                 borderDash: [5, 5]
-              },
-              ticks: {
+            },
+            ticks: {
                 color: '#344767',
                 padding: 10
               }

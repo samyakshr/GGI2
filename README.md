@@ -1,4 +1,4 @@
-# GGI Dashboard
+# The Gund Gallery Immersion
 
 ## Overview
 

@@ -519,44 +519,34 @@
       try {
         const data = await fetchData();
         console.log('Fetched data:', data);
-        
-        // Update emotion display
-        const emotionCounts = data.emotionCounts;
-        const dominantEmotion = Object.entries(emotionCounts).reduce((a, b) => a[1] > b[1] ? a : b)[0];
-        
+        const responses = data.recentResponses || [];
         const emotionIcon = document.getElementById('emotion-icon');
         const emotionText = document.getElementById('emotion-text');
-        
-        emotionIcon.textContent = getEmotionIcon(dominantEmotion);
-        emotionIcon.className = `emotion-icon ${dominantEmotion.toLowerCase()}`;
-        emotionText.textContent = dominantEmotion.toUpperCase();
-        emotionText.className = `emotion-text ${dominantEmotion.toLowerCase()}`;
-        
-        // Update artwork display and recent experience ticker
         const artworkDisplay = document.getElementById('artwork-display');
         const recentExperience = document.getElementById('recent-experience');
-        const responses = data.recentResponses || [];
-        
         if (responses.length > 0) {
           const latestResponse = responses[0];
-          
+          // Use the latest response's emotion for icon and text
+          emotionIcon.textContent = getEmotionIcon(latestResponse.emotion);
+          emotionIcon.className = `emotion-icon ${latestResponse.emotion.toLowerCase()}`;
+          emotionText.textContent = latestResponse.emotion.toUpperCase();
+          emotionText.className = `emotion-text ${latestResponse.emotion.toLowerCase()}`;
           // Update artwork display
           artworkDisplay.textContent = `Currently Viewing: ${latestResponse.artwork}`;
           artworkDisplay.style.display = 'block';
-          
           // Update ticker with only the most recent response and its emotion
           const tickerText = `"${latestResponse.experience}" • Feeling ${latestResponse.emotion}`;
           recentExperience.textContent = tickerText;
-          recentExperience.className = `recent-experience ${latestResponse.emotion.toLowerCase()}`; // Apply emotion color
+          recentExperience.className = `recent-experience ${latestResponse.emotion.toLowerCase()}`;
           recentExperience.style.display = 'block';
         } else {
+          emotionIcon.textContent = getEmotionIcon('happy');
+          emotionText.textContent = 'HAPPY';
           artworkDisplay.textContent = 'No artwork information available';
           recentExperience.textContent = 'No responses yet';
         }
-        
       } catch (error) {
         console.error('Error updating display:', error);
-        // Set default content if there's an error
         document.getElementById('emotion-icon').textContent = getEmotionIcon('happy');
         document.getElementById('emotion-text').textContent = 'HAPPY';
         document.getElementById('artwork-display').textContent = 'Unable to load artwork information';

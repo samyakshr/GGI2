@@ -453,7 +453,7 @@
             'happy': 'text-success',
             'sad': 'text-danger',
             'nostalgic': 'text-info',
-            'bored': 'text-warning'
+            'inspired': 'text-warning'
           };
           const emotionColor = emotionColors[response.emotion] || 'text-dark';
           
@@ -576,7 +576,7 @@
         'happy': 0,
         'sad': 0,
         'nostalgic': 0,
-        'bored': 0
+        'inspired': 0
       };
       for (let i = 1; i < values.length; i++) {
         const row = values[i];
@@ -608,7 +608,7 @@
         recentResponses: recent10,
         dailyStats: {
           totalResponses: values.length - 1,
-          engagementRate: Math.round(((emotionCounts.happy + emotionCounts.nostalgic) / (values.length - 1)) * 100)
+          engagementRate: Math.round(((emotionCounts.happy + emotionCounts.nostalgic + emotionCounts.inspired) / (values.length - 1)) * 100)
         }
       };
     }
@@ -625,7 +625,7 @@
           'happy': 1,
           'sad': 1,
           'nostalgic': 1,
-          'bored': 0
+          'inspired': 0
         },
         recentResponses: [
           {
@@ -672,7 +672,7 @@
     // Function to process time-based emotion data
     function processTimeEmotionData(responses) {
       const timeSlots = Array.from({length: 24}, (_, i) => i);
-      const emotions = ['happy', 'sad', 'nostalgic', 'bored'];
+      const emotions = ['happy', 'sad', 'nostalgic', 'inspired'];
       const data = {};
       
       emotions.forEach(emotion => {
@@ -692,7 +692,7 @@
       console.log('Processing artwork-emotion data from responses:', responses);
       
       const data = {};
-      const emotions = ['happy', 'sad', 'nostalgic', 'bored'];
+      const emotions = ['happy', 'sad', 'nostalgic', 'inspired'];
       
       // Initialize data structure for each emotion
       emotions.forEach(emotion => {
@@ -728,7 +728,7 @@
         happy: '#4CAF50',
         sad: '#F44336',
         nostalgic: '#2196F3',
-        bored: '#FFC107'
+        inspired: '#FFC107'
       };
       
       emotionTimeChart = new Chart(ctx, {
@@ -1166,7 +1166,7 @@
           'happy': 'text-success',
           'sad': 'text-danger',
           'nostalgic': 'text-info',
-          'bored': 'text-warning'
+          'inspired': 'text-warning'
         };
         const emotionColor = emotionColors[response.emotion] || 'text-dark';
         

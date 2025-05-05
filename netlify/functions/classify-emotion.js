@@ -20,7 +20,7 @@ exports.handler = async (event) => {
       messages: [
         {
           role: 'system',
-          content: `You are an emotion classifier. Given a user's text, respond with ONLY one of these exact words: happy, sad, nostalgic, bored. If the text does not fit any, respond with "bored". Do not explain. Do not use any other words.`
+          content: `You are an emotion classifier. Given a user's text, respond with ONLY one of these exact words: happy, sad, nostalgic, inspired. If the text does not fit any, respond with "inspired". Do not explain. Do not use any other words.`
         },
         {
           role: 'user',
@@ -33,9 +33,9 @@ exports.handler = async (event) => {
   });
 
   const data = await openaiRes.json();
-  let emotion = data.choices?.[0]?.message?.content?.trim().toLowerCase() || 'bored';
-  const allowed = ['happy', 'sad', 'nostalgic', 'bored'];
-  if (!allowed.includes(emotion)) emotion = 'bored';
+  let emotion = data.choices?.[0]?.message?.content?.trim().toLowerCase() || 'inspired';
+  const allowed = ['happy', 'sad', 'nostalgic', 'inspired'];
+  if (!allowed.includes(emotion)) emotion = 'inspired';
 
   return {
     statusCode: 200,

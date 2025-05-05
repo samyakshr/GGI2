@@ -347,9 +347,9 @@
       color: #FF69B4;
       text-shadow: 0 0 30px rgba(255, 105, 180, 0.6);
     }
-    .bored { 
-      color: #808080;
-      text-shadow: 0 0 30px rgba(128, 128, 128, 0.6);
+    .inspired { 
+      color: #FFD700;
+      text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
     }
   </style>
 </head>
@@ -378,7 +378,7 @@
         case 'happy': return '😊';
         case 'sad': return '😢';
         case 'nostalgic': return '😌';
-        case 'bored': return '😐';
+        case 'inspired': return '✨';
         default: return '😊';
       }
     }
@@ -426,7 +426,7 @@
         'happy': 0,
         'sad': 0,
         'nostalgic': 0,
-        'bored': 0
+        'inspired': 0
       };
       
       const recentResponses = [];
@@ -467,19 +467,19 @@
       const happyKeywords = ['happy', 'joy', 'great', 'wonderful', 'amazing', 'love', 'enjoy', 'beautiful', 'excellent', 'fantastic', 'inspiring', 'uplifting', 'delightful', 'peaceful', 'calm'];
       const sadKeywords = ['sad', 'disappoint', 'bad', 'poor', 'unhappy', 'terrible', 'awful', 'horrible', 'upset', 'depressed', 'uninspiring', 'disheartening', 'gloomy', 'melancholy'];
       const nostalgicKeywords = ['nostalgic', 'memory', 'remember', 'childhood', 'past', 'old', 'back then', 'reminisce', 'recall', 'memories', 'youth', 'childhood', 'reminiscent', 'sentimental', 'grandmother', 'grandfather', 'family'];
-      const boredKeywords = ['bored', 'boring', 'uninteresting', 'dull', 'tired', 'monotonous', 'repetitive', 'tedious', 'uninspiring', 'unexciting', 'uninspired', 'unmotivated'];
+      const inspiredKeywords = ['inspired', 'inspiring', 'motivate', 'motivated', 'creative', 'creativity', 'awe', 'amazed', 'moved', 'uplifted', 'empowered', 'energized', 'stimulated', 'encouraged', 'impressed'];
       
       const counts = {
         'happy': 0,
         'sad': 0,
         'nostalgic': 0,
-        'bored': 0
+        'inspired': 0
       };
       
       happyKeywords.forEach(keyword => { if (text.includes(keyword)) counts.happy++; });
       sadKeywords.forEach(keyword => { if (text.includes(keyword)) counts.sad++; });
       nostalgicKeywords.forEach(keyword => { if (text.includes(keyword)) counts.nostalgic++; });
-      boredKeywords.forEach(keyword => { if (text.includes(keyword)) counts.bored++; });
+      inspiredKeywords.forEach(keyword => { if (text.includes(keyword)) counts.inspired++; });
       
       let maxCount = 0;
       let maxEmotion = 'happy';
@@ -501,7 +501,7 @@
           'happy': 1,
           'sad': 0,
           'nostalgic': 0,
-          'bored': 0
+          'inspired': 0
         },
         recentResponses: [
           {

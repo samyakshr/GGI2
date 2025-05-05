@@ -2,7 +2,7 @@
 
 ## Overview
 
-**GGI Dashboard** is a web-based analytics and engagement platform designed for The Gund Gallery. It visualizes and analyzes visitor responses to various artworks, providing real-time insights into visitor emotions, artwork popularity, and engagement trends. The dashboard is powered by data collected from a Google Form, stored in a Google Sheet, and fetched dynamically via the Google Sheets API.
+**GGI** is a web-based analytics and engagement platform designed for The Gund Gallery. It visualizes and analyzes visitor responses to various artworks, providing real-time insights into visitor emotions, artwork popularity, and engagement trends. The dashboard is powered by data collected from a Google Form, stored in a Google Sheet, and fetched dynamically via the Google Sheets API.
 
 The project features:
 - Real-time charts and metrics for artwork popularity and visitor emotions

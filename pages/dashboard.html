@@ -526,7 +526,7 @@
           throw new Error('No data found in sheet');
         }
         
-        const processedData = processSheetData(data.values);
+        const processedData = await processSheetData(data.values);
         
         // Process monthly data instead of weekly
         const monthlyData = processMonthlyData(processedData.recentResponses);
@@ -540,104 +540,57 @@
     }
 
     // Function to classify emotion from text
-    function classifyEmotion(text) {
-      if (!text) return 'happy'; // Default case
-      
-      text = text.toLowerCase();
-      console.log('Classifying emotion for text:', text);
-      
-      const emotionKeywords = {
-        happy: ['happy', 'joy', 'great', 'wonderful', 'amazing', 'love', 'enjoy', 'beautiful', 'excellent', 'fantastic', 'inspiring', 'uplifting', 'delightful', 'peaceful', 'calm', 'good', 'nice', 'liked', 'interesting'],
-        
-        sad: ['sad', 'disappoint', 'bad', 'poor', 'unhappy', 'terrible', 'awful', 'horrible', 'upset', 'depressed', 'uninspiring', 'disheartening', 'gloomy', 'melancholy', 'dislike', 'unfortunate', 'worse'],
-        
-        nostalgic: ['nostalgic', 'memory', 'remember', 'childhood', 'past', 'old', 'back then', 'reminisce', 'recall', 'memories', 'youth', 'reminiscent', 'sentimental', 'grandmother', 'grandfather', 'family', 'reminded', 'remind', 'used to'],
-        
-        bored: ['bored', 'boring', 'uninteresting', 'dull', 'tired', 'monotonous', 'repetitive', 'tedious', 'uninspiring', 'unexciting', 'plain', 'ordinary', 'meh', 'whatever', 'nothing special']
-      };
-      
-      const scores = {
-        happy: 0,
-        sad: 0,
-        nostalgic: 0,
-        bored: 0
-      };
-      
-      // Calculate scores for each emotion
-      Object.entries(emotionKeywords).forEach(([emotion, keywords]) => {
-        keywords.forEach(keyword => {
-          if (text.includes(keyword)) {
-            scores[emotion]++;
-            console.log(`Found keyword "${keyword}" for emotion "${emotion}"`);
-          }
+    async function classifyEmotion(text) {
+      if (!text) return 'unknown';
+      try {
+        const response = await fetch('/.netlify/functions/classify-emotion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
         });
-      });
-      
-      console.log('Emotion scores:', scores);
-      
-      // Find emotion with highest score
-      let maxScore = 0;
-      let classifiedEmotion = 'happy'; // Default
-      
-      Object.entries(scores).forEach(([emotion, score]) => {
-        if (score > maxScore) {
-          maxScore = score;
-          classifiedEmotion = emotion;
-        }
-      });
-      
-      console.log('Classified emotion:', classifiedEmotion);
-      return classifiedEmotion;
+        const data = await response.json();
+        return data.emotion;
+      } catch (e) {
+        console.error('Emotion classification failed:', e);
+        return 'unknown';
+      }
     }
 
     // Function to process sheet data
-    function processSheetData(values) {
+    async function processSheetData(values) {
       if (!values || values.length === 0) {
         throw new Error('No data found in the sheet');
       }
-      
       const headers = values[0];
       const experienceColIndex = 1;
       const artworkColIndex = 2;
       const timestampColIndex = 0;
-      
-      // Store all responses for the View All functionality
       allResponses = [];
-      
       const artworkVotes = {
         'Measuring the Universe': 0,
         'Think Far': 0,
         'From Wind to Rivers to the Abyssal Plain': 0,
         'Eleven Columns': 0
       };
-      
       const emotionCounts = {
         'happy': 0,
         'sad': 0,
         'nostalgic': 0,
         'bored': 0
       };
-      
-      // Process all rows except header
       for (let i = 1; i < values.length; i++) {
         const row = values[i];
         const experience = row[experienceColIndex]?.trim() || '';
         const artwork = row[artworkColIndex]?.trim() || '';
-        
-        // Count artwork votes
         if (artwork && artworkVotes.hasOwnProperty(artwork)) {
           artworkVotes[artwork]++;
           console.log(`Counted vote for artwork: ${artwork}`);
         }
-        
-        const emotion = classifyEmotion(experience);
+        const emotion = await classifyEmotion(experience);
         console.log(`Row ${i} - Experience: "${experience}" classified as: ${emotion}`);
-        
         if (emotionCounts.hasOwnProperty(emotion)) {
           emotionCounts[emotion]++;
         }
-        
-        // Add to recent responses
         allResponses.push({
           experience: experience,
           artwork: artwork || 'Unknown',
@@ -645,14 +598,10 @@
           timestamp: row[timestampColIndex]
         });
       }
-      
       console.log('Final artwork votes:', artworkVotes);
       console.log('Final emotion counts:', emotionCounts);
-      
-      // Sort responses by timestamp (most recent first)
       allResponses.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
       const recent10 = allResponses.slice(0, 10);
-      
       return {
         artworkVotes,
         emotionCounts,

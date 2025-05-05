@@ -383,66 +383,44 @@
       }
     }
 
-    // Function to fetch data from Google Sheets
-    async function fetchData() {
+    // Replace the classifyEmotion function with the async OpenAI-powered version
+    async function classifyEmotion(text) {
+      if (!text) return 'unknown';
       try {
-        console.log('Fetching data from Google Sheets...');
-        const spreadsheetId = '1HbaoSO3-QHKhYUHy4DuerkH_Z2kV9eoPQOOhTkTWwhQ';
-        const apiKey = 'AIzaSyCOmA67laPyNblmRifkKckoYCZKo8FmyfU';
-        const range = 'Form Responses 1!A:D';
-        
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
-        
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json'
-          }
+        const response = await fetch('/.netlify/functions/classify-emotion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
         });
-        
-        if (!response.ok) {
-          throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-        }
-        
         const data = await response.json();
-        if (!data.values || data.values.length === 0) {
-          throw new Error('No data found in sheet');
-        }
-        
-        return processSheetData(data.values);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        return getSampleData();
+        return data.emotion;
+      } catch (e) {
+        console.error('Emotion classification failed:', e);
+        return 'unknown';
       }
     }
 
-    // Function to process sheet data
-    function processSheetData(values) {
-      const experienceColIndex = 1; // "How would you describe your experience..."
-      const artworkColIndex = 2;    // "Which artwork stood out to you the most?"
-      const timestampColIndex = 0;   // Timestamp column
-      
+    // Make processSheetData async and use classifyEmotion
+    async function processSheetData(values) {
+      const experienceColIndex = 1;
+      const artworkColIndex = 2;
+      const timestampColIndex = 0;
       const emotionCounts = {
         'happy': 0,
         'sad': 0,
         'nostalgic': 0,
         'inspired': 0
       };
-      
       const recentResponses = [];
-      
-      // Process all rows (skip header)
       for (let i = 1; i < values.length; i++) {
         const row = values[i];
         const experience = row[experienceColIndex]?.trim() || '';
         const artwork = row[artworkColIndex]?.trim() || '';
         const timestamp = row[timestampColIndex];
-        
-        const emotion = classifyEmotion(experience);
+        const emotion = await classifyEmotion(experience);
         if (emotionCounts.hasOwnProperty(emotion)) {
           emotionCounts[emotion]++;
         }
-        
         recentResponses.push({
           experience: experience,
           artwork: artwork,
@@ -450,48 +428,39 @@
           timestamp: timestamp
         });
       }
-      
-      // Sort responses by timestamp (most recent first)
       recentResponses.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-      
       return {
         emotionCounts,
         recentResponses
       };
     }
 
-    // Function to classify emotion from text
-    function classifyEmotion(text) {
-      text = text.toLowerCase();
-      
-      const happyKeywords = ['happy', 'joy', 'great', 'wonderful', 'amazing', 'love', 'enjoy', 'beautiful', 'excellent', 'fantastic', 'inspiring', 'uplifting', 'delightful', 'peaceful', 'calm'];
-      const sadKeywords = ['sad', 'disappoint', 'bad', 'poor', 'unhappy', 'terrible', 'awful', 'horrible', 'upset', 'depressed', 'uninspiring', 'disheartening', 'gloomy', 'melancholy'];
-      const nostalgicKeywords = ['nostalgic', 'memory', 'remember', 'childhood', 'past', 'old', 'back then', 'reminisce', 'recall', 'memories', 'youth', 'childhood', 'reminiscent', 'sentimental', 'grandmother', 'grandfather', 'family'];
-      const inspiredKeywords = ['inspired', 'inspiring', 'motivate', 'motivated', 'creative', 'creativity', 'awe', 'amazed', 'moved', 'uplifted', 'empowered', 'energized', 'stimulated', 'encouraged', 'impressed'];
-      
-      const counts = {
-        'happy': 0,
-        'sad': 0,
-        'nostalgic': 0,
-        'inspired': 0
-      };
-      
-      happyKeywords.forEach(keyword => { if (text.includes(keyword)) counts.happy++; });
-      sadKeywords.forEach(keyword => { if (text.includes(keyword)) counts.sad++; });
-      nostalgicKeywords.forEach(keyword => { if (text.includes(keyword)) counts.nostalgic++; });
-      inspiredKeywords.forEach(keyword => { if (text.includes(keyword)) counts.inspired++; });
-      
-      let maxCount = 0;
-      let maxEmotion = 'happy';
-      
-      for (const emotion in counts) {
-        if (counts[emotion] > maxCount) {
-          maxCount = counts[emotion];
-          maxEmotion = emotion;
+    // In fetchData, await processSheetData
+    async function fetchData() {
+      try {
+        console.log('Fetching data from Google Sheets...');
+        const spreadsheetId = '1HbaoSO3-QHKhYUHy4DuerkH_Z2kV9eoPQOOhTkTWwhQ';
+        const apiKey = 'AIzaSyCOmA67laPyNblmRifkKckoYCZKo8FmyfU';
+        const range = 'Form Responses 1!A:D';
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status} ${response.statusText}`);
         }
+        const data = await response.json();
+        if (!data.values || data.values.length === 0) {
+          throw new Error('No data found in sheet');
+        }
+        return await processSheetData(data.values);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        return getSampleData();
       }
-      
-      return maxEmotion;
     }
 
     // Function to get sample data

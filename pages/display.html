@@ -514,11 +514,24 @@
       };
     }
 
+    // Function to censor text
+    function censorText(text) {
+      const badWords = [
+        'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'dick', 'cunt', 'piss', 'crap', 'damn', 'slut', 'whore'
+        // Add more as needed
+      ];
+      let censored = text;
+      badWords.forEach(word => {
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        censored = censored.replace(regex, '****');
+      });
+      return censored;
+    }
+
     // Function to update display
     async function updateDisplay() {
       try {
         const data = await fetchData();
-        console.log('Fetched data:', data);
         const responses = data.recentResponses || [];
         const emotionIcon = document.getElementById('emotion-icon');
         const emotionText = document.getElementById('emotion-text');
@@ -526,6 +539,8 @@
         const recentExperience = document.getElementById('recent-experience');
         if (responses.length > 0) {
           const latestResponse = responses[0];
+          // Debug log
+          console.log('Latest response:', latestResponse);
           // Use the latest response's emotion for icon and text
           emotionIcon.textContent = getEmotionIcon(latestResponse.emotion);
           emotionIcon.className = `emotion-icon ${latestResponse.emotion.toLowerCase()}`;
@@ -534,8 +549,10 @@
           // Update artwork display
           artworkDisplay.textContent = `Currently Viewing: ${latestResponse.artwork}`;
           artworkDisplay.style.display = 'block';
+          // Censor the experience text
+          const censoredExperience = censorText(latestResponse.experience);
           // Update ticker with only the most recent response and its emotion
-          const tickerText = `"${latestResponse.experience}" • Feeling ${latestResponse.emotion}`;
+          const tickerText = `"${censoredExperience}" • Feeling ${latestResponse.emotion}`;
           recentExperience.textContent = tickerText;
           recentExperience.className = `recent-experience ${latestResponse.emotion.toLowerCase()}`;
           recentExperience.style.display = 'block';

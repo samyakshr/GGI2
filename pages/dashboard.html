@@ -488,7 +488,11 @@
       }
     }
 
-    // Function to fetch data from Google Sheets
+    /**
+     * Fetches data from Google Sheets, processes it, and updates monthly chart.
+     * Falls back to sample data if API fails.
+     * @returns {Promise<Object>} Processed data for dashboard charts and stats.
+     */
     async function fetchData() {
       try {
         console.log('Fetching data from Google Sheets...');
@@ -527,7 +531,11 @@
       }
     }
 
-    // Function to classify emotion from text
+    /**
+     * Classifies the emotion of a given text using the OpenAI-powered backend function.
+     * @param {string} text - The user experience text to classify.
+     * @returns {Promise<string>} The classified emotion ('happy', 'sad', 'nostalgic', 'inspired', or 'unknown').
+     */
     async function classifyEmotion(text) {
       if (!text) return 'unknown';
       try {
@@ -544,7 +552,12 @@
       }
     }
 
-    // Function to process sheet data
+    /**
+     * Processes Google Sheets data into chart-ready objects and stats.
+     * Classifies emotions for each response and tallies artwork votes and emotions.
+     * @param {Array<Array<string>>} values - Raw sheet data (rows of columns).
+     * @returns {Promise<Object>} Processed data for charts and stats.
+     */
     async function processSheetData(values) {
       if (!values || values.length === 0) {
         throw new Error('No data found in the sheet');
@@ -601,6 +614,10 @@
       };
     }
 
+    /**
+     * Returns a sample data object for fallback or testing purposes.
+     * @returns {Object} Sample data with artwork votes, emotion counts, responses, and stats.
+     */
     function getSampleData() {
       return {
         artworkVotes: {
@@ -642,7 +659,10 @@
       };
     }
 
-    // Function to update daily statistics
+    /**
+     * Updates the daily statistics section of the dashboard.
+     * @param {Object} dailyStats - Object with totalResponses and engagementRate.
+     */
     function updateDailyStats(dailyStats) {
       console.log('Updating daily stats with:', dailyStats);
       const totalResponsesElement = document.getElementById('total-responses');
@@ -657,7 +677,11 @@
       }
     }
 
-    // Function to process time-based emotion data
+    /**
+     * Processes responses to count emotions by hour of day.
+     * @param {Array<Object>} responses - List of response objects.
+     * @returns {Object} Mapping of emotion to array of 24 hourly counts.
+     */
     function processTimeEmotionData(responses) {
       const timeSlots = Array.from({length: 24}, (_, i) => i);
       const emotions = ['happy', 'sad', 'nostalgic', 'inspired'];
@@ -675,7 +699,11 @@
       return data;
     }
 
-    // Function to process artwork-emotion data
+    /**
+     * Processes responses to count each emotion for each artwork.
+     * @param {Array<Object>} responses - List of response objects.
+     * @returns {Object} Mapping of emotion to artwork vote counts.
+     */
     function processArtworkEmotionData(responses) {
       console.log('Processing artwork-emotion data from responses:', responses);
       
@@ -703,7 +731,10 @@
       return data;
     }
 
-    // Function to update emotion time chart
+    /**
+     * Updates the line chart showing emotion counts by hour.
+     * @param {Object} data - Mapping of emotion to array of 24 hourly counts.
+     */
     function updateEmotionTimeChart(data) {
       const ctx = document.getElementById('emotion-time-chart');
       if (!ctx) return;
@@ -752,71 +783,10 @@
       });
     }
 
-    // Function to update artwork-emotion chart
-    function updateArtworkEmotionChart(data) {
-      const ctx = document.getElementById('artwork-emotion-chart');
-      if (!ctx) return;
-      
-      if (artworkEmotionChart) {
-        artworkEmotionChart.destroy();
-      }
-      
-      const emotions = Object.keys(data);
-      const artworks = Object.keys(data[emotions[0]]);
-      const colors = {
-        'Tree': '#4CAF50',    // Green
-        'Flower': '#F44336',  // Red
-        'Swing': '#2196F3',   // Blue
-        'House': '#FFC107'    // Yellow
-      };
-      
-      artworkEmotionChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: emotions.map(e => e.charAt(0).toUpperCase() + e.slice(1)),
-          datasets: artworks.map(artwork => ({
-            label: artwork,
-            data: emotions.map(emotion => data[emotion][artwork]),
-            backgroundColor: colors[artwork],
-            borderColor: colors[artwork],
-            borderWidth: 1
-          }))
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            title: {
-              display: true,
-              text: 'Artwork Popularity by Emotion'
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                stepSize: 1
-              },
-              title: {
-                display: true,
-                text: 'Number of Responses'
-              }
-            },
-            x: {
-              title: {
-                display: true,
-                text: 'Emotions'
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // Function to update time heatmap
+    /**
+     * Updates the heatmap chart showing response frequency by day and hour.
+     * @param {Array<Object>} responses - List of response objects.
+     */
     function updateTimeHeatmap(responses) {
       const ctx = document.getElementById('time-heatmap');
       if (!ctx) return;
@@ -909,7 +879,10 @@
       });
     }
 
-    // Function to update engagement gauge
+    /**
+     * Updates the engagement gauge chart.
+     * @param {number} engagementRate - Percentage of engaged responses.
+     */
     function updateEngagementGauge(engagementRate) {
       const ctx = document.getElementById('engagement-gauge');
       if (!ctx) return;
@@ -949,7 +922,10 @@
       });
     }
 
-    // Function to update artwork votes chart
+    /**
+     * Updates the bar chart showing artwork votes.
+     * @param {Object} votesData - Mapping of artwork name to vote count.
+     */
     function updateArtworkVotesChart(votesData) {
       console.log('Updating artwork votes chart with:', votesData);
       const ctx = document.getElementById("artwork-chart");
@@ -1046,7 +1022,10 @@
       });
     }
 
-    // Function to update emotion chart
+    /**
+     * Updates the line chart showing emotion analysis.
+     * @param {Object} emotionData - Mapping of emotion to count.
+     */
     function updateEmotionChart(emotionData) {
       console.log('Updating emotion chart with:', emotionData);
       const ctx = document.getElementById("emotion-chart");
@@ -1124,7 +1103,10 @@
       });
     }
 
-    // Function to update recent responses
+    /**
+     * Updates the Recent Responses section with the latest responses.
+     * @param {Array<Object>} responses - List of recent response objects.
+     */
     function updateRecentResponses(responses) {
       console.log('Updating recent responses:', responses);
       const container = document.getElementById('recent-responses');
@@ -1177,7 +1159,11 @@
       });
     }
 
-    // Function to update charts with new data
+    /**
+     * Fetches and updates all dashboard charts and stats.
+     * Called on page load and every 30 seconds.
+     * @returns {Promise<void>}
+     */
     async function updateCharts() {
       console.log('Updating charts...');
       const data = await fetchData();
@@ -1213,7 +1199,11 @@
       updateEngagementGauge(data.dailyStats?.engagementRate || 0);
     }
 
-    // Function to process monthly entries data
+    /**
+     * Processes responses to count entries per month for the monthly chart.
+     * @param {Array<Object>} responses - List of response objects.
+     * @returns {Array<Object>} Array of {month, count} for each month.
+     */
     function processMonthlyData(responses) {
       // Create a map to store counts by month
       const monthlyData = new Map();
@@ -1241,7 +1231,10 @@
       return data;
     }
 
-    // Function to update monthly entries chart
+    /**
+     * Updates the monthly entries chart.
+     * @param {Array<Object>} monthlyData - Array of {month, count} objects.
+     */
     function updateMonthlyChart(monthlyData) {
       const ctx = document.getElementById('weekly-entries-chart').getContext('2d');
       

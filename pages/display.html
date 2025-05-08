@@ -373,6 +373,11 @@
 
   <script>
     // Function to get emotion icon
+    /**
+     * Returns the emoji icon for a given emotion string.
+     * @param {string} emotion - The emotion label (e.g., 'happy', 'sad').
+     * @returns {string} Emoji character for the emotion.
+     */
     function getEmotionIcon(emotion) {
       switch(emotion.toLowerCase()) {
         case 'happy': return '😊';
@@ -384,6 +389,11 @@
     }
 
     // Replace the classifyEmotion function with the async OpenAI-powered version
+    /**
+     * Classifies the emotion of a given text using the OpenAI-powered backend function.
+     * @param {string} text - The user experience text to classify.
+     * @returns {Promise<string>} The classified emotion ('happy', 'sad', 'nostalgic', 'inspired', or 'unknown').
+     */
     async function classifyEmotion(text) {
       if (!text) return 'unknown';
       try {
@@ -464,6 +474,10 @@
     }
 
     // Function to get sample data
+    /**
+     * Returns a sample data object for fallback or testing purposes.
+     * @returns {Object} Sample data with emotion counts and a recent response.
+     */
     function getSampleData() {
       return {
         emotionCounts: {
@@ -484,6 +498,11 @@
     }
 
     // Function to censor text
+    /**
+     * Censors curse words in the input text by replacing them with asterisks (****).
+     * @param {string} text - The input text to censor.
+     * @returns {string} The censored text with bad words replaced by '****'.
+     */
     function censorText(text) {
       const badWords = [
         'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'dick', 'cunt', 'piss', 'crap', 'damn', 'slut', 'whore'
@@ -498,6 +517,12 @@
     }
 
     // Function to update display
+    /**
+     * Updates the display page with the latest response, emotion, and artwork.
+     * Fetches data, classifies emotion, censors text, and updates DOM elements.
+     * Handles empty state gracefully.
+     * @returns {Promise<void>}
+     */
     async function updateDisplay() {
       try {
         const data = await fetchData();
